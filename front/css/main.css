@@ -1,0 +1,13 @@
+@import "classExplorer.css";
+
+
+#viewport {
+    background: black;
+}
+
+body {
+    padding: 0;
+    margin:0;
+}
+
+
