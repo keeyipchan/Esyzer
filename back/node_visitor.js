@@ -181,22 +181,22 @@
     exports.traverse.Skip = Skip;
 }(typeof exports === 'undefined' ? (plugin = {}) : exports));
 
-(function () {
-    'use strict';
-
-    // test
-    plugin.traverse({
-        type: 'BinaryExpression',
-        operator: '+',
-        left: { type: 'Literal', value: 40 },
-        right: { type: 'Literal', value: 2 }
-    }, {
-        enter: function (node) {
-            console.log('enter', node);
-        },
-        leave: function (node) {
-            console.log('leave', node);
-        }
-    });
-}());
+//(function () {
+//    'use strict';
+//
+//    // test
+//    plugin.traverse({
+//        type: 'BinaryExpression',
+//        operator: '+',
+//        left: { type: 'Literal', value: 40 },
+//        right: { type: 'Literal', value: 2 }
+//    }, {
+//        enter: function (node) {
+//            console.log('enter', node);
+//        },
+//        leave: function (node) {
+//            console.log('leave', node);
+//        }
+//    });
+//}());
 /* vim: set sw=4 ts=4 et tw=80 : */
