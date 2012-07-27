@@ -2,7 +2,8 @@
 var esprima = require('esprima');
 var analyzer = require('../analyzer');
 var ast;
-exports.scope = {
+
+exports.scope_creation = {
     createScope:function (test) {
         ast = esprima.parse(';');
         analyzer.analyze(ast);
@@ -25,7 +26,34 @@ exports.scope = {
     declareVarInScope: function (test) {
         ast = esprima.parse('var a;');
         analyzer.analyze(ast);
-        test.ok(ast.ids !== undefined, 'identifiers in scope');
+        test.ok(ast.scope.names !== undefined, 'Identifiers must be in in scope');
+        test.ok('a' in ast.scope.names, 'Create identifier in scope');
+        test.ok(ast.scope.names['a'].name === 'a', 'Store name as a property');
+        test.done();
+    },
+    declareFunctionNameInScope: function (test) {
+        ast = esprima.parse('function asd() {};');
+        analyzer.analyze(ast);
+        test.ok('asd' in ast.scope.names);
+        test.ok(ast.scope.names['asd'].name === 'asd', 'Store name as a property');
+        test.done();
+    },
+    declareArgumentsInScope: function (test) {
+        ast = esprima.parse('var a;function asd(a,b) {};');
+        analyzer.analyze(ast);
+        test.ok('a' in ast.body[1].scope.names, 'Create function argument in scope');
+        test.ok('b' in ast.body[1].scope.names, 'Create function argument in scope');
         test.done();
     }
 };
+
+exports.scope_linking = {
+    linkAtoB: function (test) {
+        ast = esprima.parse('var a,b;' +
+            'a=b;');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
+
+        test.done();
+    }
+}
