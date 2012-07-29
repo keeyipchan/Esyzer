@@ -58,8 +58,8 @@ function getObjectRef(node) {
             var obj = getObjectRef(node.object.object);
 
             obj.markAsClass();
-            obj.addField(node.property.name);
-            return obj.getChild(node.property.name);
+            obj.instance.addField(node.property.name);
+            return obj.instance.getChild(node.property.name);
         }
 
     }

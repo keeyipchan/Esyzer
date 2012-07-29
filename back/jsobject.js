@@ -20,6 +20,9 @@ JSObject.prototype = {
     markAsClass:function () {
         if (this.isClass) return;
         this.isClass = true;
+
+        /** container for properties of 'instance' */
+        this.instance = new JSObject('<instance of '+this.name+'>');
     },
 
     markAsFunction:function (node) {

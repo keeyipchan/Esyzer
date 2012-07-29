@@ -89,7 +89,10 @@ exports.mutating = {
         test.ok(ast.scope.names['c'].isFunction, 'Deanonimizing function in assignment expression');
         test.ok(ast.scope.names['c'].node == ast.body[1].expression.right, 'Node saving in in assignment expression');
         test.done();
-    },
+    }
+};
+
+exports.class_analysis = {
     convertToClassOnNew:function (test) {
         ast = esprima.parse('\
             var o,c=function(){};\
@@ -109,16 +112,23 @@ exports.mutating = {
         test.done();
     },
 
+//    convertToClassOnThisInConstructor: function (test) {
+//        test.ok(false);
+//        test.done();
+//    },
+
     classicPrototypeMethod:function (test) {
         ast = esprima.parse('\
             var c=function(){};\
             c.prototype.t = function (){}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].fields.t !== undefined, 'create field in class');
-        test.ok(ast.scope.names['c'].fields.t.isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].fields.t.node == ast.body[1].expression.right, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.fields.t.node == ast.body[1].expression.right, 'mark field as function');
         test.done();
     }
 
+
 };
+
