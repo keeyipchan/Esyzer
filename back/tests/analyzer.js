@@ -87,10 +87,10 @@ exports.mutating = {
         test.ok(ast.scope.names['x'].isFunction, 'Deanonimizing function in variable declaration');
         test.ok(ast.scope.names['x'].node == ast.body[0].declarations[1].init, 'Node saving in variable declaration');
         test.ok(ast.scope.names['c'].isFunction, 'Deanonimizing function in assignment expression');
-        test.ok(ast.scope.names['c'].node == ast.body[1].right, 'Node saving in in assignment expression');
+        test.ok(ast.scope.names['c'].node == ast.body[1].expression.right, 'Node saving in in assignment expression');
         test.done();
     },
-    convertToClassOnNew: function (test) {
+    convertToClassOnNew:function (test) {
         ast = esprima.parse('\
             var o,c=function(){};\
             o = new c();\
@@ -99,13 +99,25 @@ exports.mutating = {
         test.ok(ast.scope.names['c'].isClass, 'Create class from trivial new');
         test.done();
     },
-    convertToClassOnPrototype: function(test) {
+    convertToClassOnPrototype:function (test) {
         ast = esprima.parse('\
             var o,c=function(){};\
             c.prototype.x = function() {}; \
         ');
         analyzer.analyze(ast);
         test.ok(ast.scope.names['c'].isClass, 'Create class from prototype access');
+        test.done();
+    },
+
+    classicPrototypeMethod:function (test) {
+        ast = esprima.parse('\
+            var c=function(){};\
+            c.prototype.t = function (){}\
+        ');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].fields.t !== undefined, 'create field in class');
+        test.ok(ast.scope.names['c'].fields.t.isFunction, 'mark field as function');
+        test.ok(ast.scope.names['c'].fields.t.node == ast.body[1].expression.right, 'mark field as function');
         test.done();
     }
 

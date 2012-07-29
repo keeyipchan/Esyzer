@@ -1,42 +1,9 @@
 "use strict";
 var visitor = require('./node_visitor');
+var JSObject = require('./jsobject').JSObject;
 
 var scopeChain = [];
 
-/** Represents all objects - functions, classes, properties, etc.
- *  can combine different types. (class+function) (function + method)
- *   a JS Objects:
- *   function
- *   method
- *   class
- * system-specific:
- *   variable  (can represent a link to another name.   a=b, a is reference to b)
- *
- * @constructor
- */
-function JSObject(scope, name) {
-    this.scope = scope;
-    this.name = name;
-    this.fields = {};
-}
-
-JSObject.prototype.markAsClass = function () {
-    if (this.isClass) return;
-    this.isClass = true;
-};
-
-JSObject.prototype.markAsFunction = function (node) {
-    if (this.isFunction) return;
-    this.isFunction = true;
-    this.node = node;
-};
-
-JSObject.prototype.markAsReference = function (ref) {
-    if (this.ref) {
-        throw Error('Trying to change reference.');
-    }
-    this.ref = ref;
-};
 
 function Scope(parent) {
     this.parent = parent || null;
@@ -51,12 +18,12 @@ Scope.prototype = {
     /** explicitly adds a new variable to scope */
     addVar:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        this.names[name] = new JSObject(this, name);
+        this.names[name] = new JSObject(name);
         return this.names[name];
     },
     addFunction:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        this.names[name] = new JSObject(this, name);
+        this.names[name] = new JSObject(name);
         this.names[name].markAsFunction();
         return this.names[name];
     },
@@ -72,9 +39,29 @@ function getScope() {
     return scopeChain[scopeChain.length - 1];
 }
 
+/**
+ *  indicates the result of evaluating node is 'prototype' property of object
+ * @param node
+ */
+function isPrototype(node) {
+    if (node.type !== 'MemberExpression') return false;
+    return node.property.type=='Identifier' && node.property.name == 'prototype' && getObjectRef(node.object);
+}
+
 function getObjectRef(node) {
     if (node.type == 'Identifier') {
         return getScope().getObject(node.name)
+    }
+
+    if (node.type=='MemberExpression') {
+        if (isPrototype(node.object) && node.property.type == 'Identifier') {
+            var obj = getObjectRef(node.object.object);
+
+            obj.markAsClass();
+            obj.addField(node.property.name);
+            return obj.getChild(node.property.name);
+        }
+
     }
 
     return null;
@@ -115,7 +102,7 @@ function enterNode(node) {
                 left.ref = right;
             } else if (node.right.type == 'FunctionExpression') {
                 //vx=function () {};
-                left.markAsFunction(node.init);
+                left.markAsFunction(node.right);
             }
             break;
 
