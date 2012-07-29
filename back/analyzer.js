@@ -3,17 +3,46 @@ var visitor = require('./node_visitor');
 
 var scopeChain = [];
 
+/** Represents all objects - functions, classes, properties, etc.
+ *  can combine different types. (class+function) (function + method)
+ *   a JS Objects:
+ *   function
+ *   method
+ *   class
+ * system-specific:
+ *   variable  (can represent a link to another name.   a=b, a is reference to b)
+ *
+ * @constructor
+ */
+function JSObject(scope, name) {
+    this.scope = scope;
+    this.name = name;
+    this.fields = {};
+}
+
+JSObject.prototype.markAsClass = function () {
+    if (this.isClass) return;
+    this.isClass = true;
+};
+
+JSObject.prototype.markAsFunction = function (node) {
+    if (this.isFunction) return;
+    this.isFunction = true;
+    this.node = node;
+};
+
+JSObject.prototype.markAsReference = function (ref) {
+    if (this.ref) {
+        throw Error('Trying to change reference.');
+    }
+    this.ref = ref;
+};
 
 function Scope(parent) {
     this.parent = parent || null;
 
     /** hash of names
-     * each name is an object representing variable or function
-     * variable:
-     * { name:'<x>', type:'var', ref:... }
-     * function:
-     * { name:'<x>', type:'func', ??? }
-     * @type {Object}
+     * each name is an JSObject
      */
     this.names = {};
 }
@@ -22,22 +51,16 @@ Scope.prototype = {
     /** explicitly adds a new variable to scope */
     addVar:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        return this.names[name] = {
-            name:name,
-            scope: this,
-            type:'var',
-            ref:null
-        }
+        this.names[name] = new JSObject(this, name);
+        return this.names[name];
     },
     addFunction:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        return this.names[name] = {
-            name:name,
-            scope: this,
-            type:'func'
-        }
+        this.names[name] = new JSObject(this, name);
+        this.names[name].markAsFunction();
+        return this.names[name];
     },
-    getObject: function(name) {
+    getObject:function (name) {
         if (this.names[name]) return this.names[name];
         if (this.parent) return this.parent.getObject(name);
         return null;
@@ -71,24 +94,43 @@ function enterNode(node) {
         case 'VariableDeclarator':
             var v = getScope().addVar(node.id.name);
             if (node.init) {
+                if (v.ref) throw 'Multiple referencing';
                 var init = getObjectRef(node.init);
                 if (init) {
-                    if (v.ref !== null) throw 'Multiple referencing';
                     v.ref = init
+                } else if (node.init.type == 'FunctionExpression') {
+                    //var x=function () {};
+                    v.markAsFunction(node.init);
                 }
+
             }
             break;
 
         case 'AssignmentExpression':
             var left = getObjectRef(node.left);
             if (!left) break;
+            if (left.ref) throw 'Multiple referencing';
             var right = getObjectRef(node.right);
-            if (!right) break;
-            if (left.type == 'var') {
-                if (left.ref !== null) throw 'Multiple referencing';
-                left.ref = right
+            if (right) {
+                left.ref = right;
+            } else if (node.right.type == 'FunctionExpression') {
+                //vx=function () {};
+                left.markAsFunction(node.init);
             }
+            break;
 
+        case 'NewExpression':
+            var obj = getObjectRef(node.callee);
+            if (!obj) break;
+            obj.markAsClass();
+            break;
+
+        case 'MemberExpression':
+            obj = getObjectRef(node.object);
+            if (!obj) break;
+            if (node.property.type == 'Identifier' && node.property.name == 'prototype') {
+                obj.markAsClass();
+            }
             break;
     }
 }
