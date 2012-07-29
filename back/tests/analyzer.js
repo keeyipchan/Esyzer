@@ -45,6 +45,7 @@ exports.scope_creation = {
         test.ok('b' in ast.body[1].scope.names, 'Create function argument in scope');
         test.done();
     }
+
 };
 
 exports.scope_linking = {
@@ -55,5 +56,23 @@ exports.scope_linking = {
         test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
 
         test.done();
+    },
+    linkAtoBInDeclaration: function (test) {
+        ast = esprima.parse('var b;' +
+            'var a=b;');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
+
+        test.done();
+    },
+    linkAtoOutsideB: function (test) {
+        ast = esprima.parse('var b;' +
+            'function ttt() {' +
+            'var a=b;' +
+            '}');
+        analyzer.analyze(ast);
+        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
+
+        test.done();
     }
-}
+};

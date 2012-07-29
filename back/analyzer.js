@@ -22,7 +22,7 @@ Scope.prototype = {
     /** explicitly adds a new variable to scope */
     addVar:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        this.names[name] = {
+        return this.names[name] = {
             name:name,
             scope: this,
             type:'var',
@@ -31,7 +31,7 @@ Scope.prototype = {
     },
     addFunction:function (name) {
         if (this.names[name]) throw 'name ' + name + 'already defined'
-        this.names[name] = {
+        return this.names[name] = {
             name:name,
             scope: this,
             type:'func'
@@ -69,7 +69,14 @@ function enterNode(node) {
             break;
 
         case 'VariableDeclarator':
-            getScope().addVar(node.id.name);
+            var v = getScope().addVar(node.id.name);
+            if (node.init) {
+                var init = getObjectRef(node.init);
+                if (init) {
+                    if (v.ref !== null) throw 'Multiple referencing';
+                    v.ref = init
+                }
+            }
             break;
 
         case 'AssignmentExpression':
