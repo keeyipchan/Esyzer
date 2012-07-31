@@ -89,6 +89,17 @@ exports.mutating = {
         test.ok(ast.scope.names['c'].isFunction, 'Deanonimizing function in assignment expression');
         test.ok(ast.scope.names['c'].node == ast.body[1].expression.right, 'Node saving in in assignment expression');
         test.done();
+    },
+    assigningObjectToFunctionNode:function (test) {
+        ast = esprima.parse('\
+            var c = function () {},d;\
+            d = function () {};\
+        ');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].node.obj == ast.scope.names['c'], 'Associating object to function');
+        test.ok(ast.scope.names['d'].node.obj == ast.scope.names['d'], 'Associating object to function');
+        test.done();
+
     }
 };
 
@@ -112,10 +123,20 @@ exports.class_analysis = {
         test.done();
     },
 
-//    convertToClassOnThisInConstructor: function (test) {
-//        test.ok(false);
-//        test.done();
-//    },
+    convertToClassOnThisInConstructor:function (test) {
+        ast = esprima.parse('\
+            var c=function(){\
+                    this.x=1;\
+                },d;\
+                d = function () {\
+                    this.y = 2;\
+                }\
+        ');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].isClass, 'Make class on \'this\' in constructor in VariableDeclaration');
+        test.ok(ast.scope.names['d'].isClass, 'Make class on \'this\' in constructor in FunctionExpression');
+        test.done();
+    },
 
     classicPrototypeMethod:function (test) {
         ast = esprima.parse('\
@@ -127,8 +148,18 @@ exports.class_analysis = {
         test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
         test.ok(ast.scope.names['c'].instance.fields.t.node == ast.body[1].expression.right, 'mark field as function');
         test.done();
-    }
+    },
 
+    trivialProperty:function (test){
+        ast = esprima.parse('\
+            var c=function(){this.x=1};\
+            c.prototype.t = function (){this.y=2;}\
+        ');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].instance.fields.x !== undefined, 'create property on \'this.x\' in constructor');
+        test.ok(ast.scope.names['c'].instance.fields.y !== undefined, 'create property on \'this.x\' in method');
+        test.done();
+    }
 
 };
 

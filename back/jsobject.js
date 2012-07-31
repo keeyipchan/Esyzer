@@ -11,8 +11,9 @@
  *
  * @constructor
  */
-function JSObject(name) {
+function JSObject(name, parent) {
     this.name = name;
+    this.parent = parent;
     this.fields = {};
 }
 
@@ -22,25 +23,31 @@ JSObject.prototype = {
         this.isClass = true;
 
         /** container for properties of 'instance' */
-        this.instance = new JSObject('<instance of '+this.name+'>');
+        this.instance = new JSObject('<instance of '+this.name+'>', this);
+        this.instance.markAsInstance();
+    },
+
+    markAsInstance: function () {
+        this.isInstance = true;
     },
 
     markAsFunction:function (node) {
         if (this.isFunction) return;
         this.isFunction = true;
         this.node = node;
+        node && (node.obj = this);
     },
 
-    markAsReference:function (ref) {
-        if (this.ref) {
-            throw Error('Trying to change reference.');
-        }
-        this.ref = ref;
-    },
+//    markAsReference:function (ref) {
+//        if (this.ref) {
+//            throw Error('Trying to change reference.');
+//        }
+//        this.ref = ref;
+//    },
 
     addField: function (name) {
         if (this.fields[name]) return;
-        this.fields[name] = new JSObject(name);
+        this.fields[name] = new JSObject(name, this);
     },
 
     getChild: function (name) {

@@ -1,12 +1,20 @@
 "use strict";
+"use strict";
 var visitor = require('./node_visitor');
 var JSObject = require('./jsobject').JSObject;
 
-var scopeChain = [];
+var scopeChain = [], thisChain = [];
 
 
-function Scope(parent) {
+/**
+ *  Represents current scope and executional context
+ * @param parent
+ * @param node - functional node
+ * @constructor
+ */
+function Scope(parent, node) {
     this.parent = parent || null;
+    this.node = node;
 
     /** hash of names
      * each name is an JSObject
@@ -45,21 +53,40 @@ function getScope() {
  */
 function isPrototype(node) {
     if (node.type !== 'MemberExpression') return false;
-    return node.property.type=='Identifier' && node.property.name == 'prototype' && getObjectRef(node.object);
+    return node.property.type == 'Identifier' && node.property.name == 'prototype' && getObjectRef(node.object);
 }
 
+
+/** get the object referenced by node. Try to create objects and properties */
 function getObjectRef(node) {
+    var obj;
+
     if (node.type == 'Identifier') {
         return getScope().getObject(node.name)
     }
 
-    if (node.type=='MemberExpression') {
+    if (node.type == 'MemberExpression') {
         if (isPrototype(node.object) && node.property.type == 'Identifier') {
-            var obj = getObjectRef(node.object.object);
+            //a.x.prototype.b ....
+            obj = getObjectRef(node.object.object);
 
             obj.markAsClass();
             obj.instance.addField(node.property.name);
             return obj.instance.getChild(node.property.name);
+        } else if (node.object.type == 'ThisExpression') {
+            //this.x
+            obj = getScope().node.obj;
+            if (obj) {
+                if (!(obj.parent && obj.parent.isInstance)) obj.markAsClass();
+                else
+                    obj = obj.parent.parent;
+
+                //this.x inside constructor
+                if (node.property.type == 'Identifier') {
+                    var field = obj.instance.addField(node.property.name);
+                }
+            }
+
         }
 
     }
@@ -72,7 +99,7 @@ function enterNode(node) {
         case 'FunctionDeclaration':
             getScope().addFunction(node.id.name);
         case 'FunctionExpression':
-            node.scope = new Scope(scopeChain[scopeChain.length - 1]);
+            node.scope = new Scope(scopeChain[scopeChain.length - 1], node);
             scopeChain.push(node.scope);
             for (var i = 0; i < node.params.length; i++)
                 node.scope.addVar(node.params[i].name)
@@ -133,7 +160,7 @@ function leaveNode(node) {
 }
 
 exports.analyze = function (ast) {
-    ast.scope = ast.scope || new Scope();
+    ast.scope = ast.scope || new Scope(undefined, ast);
     scopeChain = [ast.scope];
 
     visitor.traverse(ast, {enter:enterNode, leave:leaveNode});
