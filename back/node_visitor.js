@@ -144,6 +144,10 @@
                     return;
                 }
 
+                if (typeof ret === 'object' && ret.mutated) {
+                    worklist.push(ret.node);
+                    continue;
+                }
                 worklist.push(null);
                 leavelist.push(node);
 

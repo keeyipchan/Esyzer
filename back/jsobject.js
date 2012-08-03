@@ -25,10 +25,12 @@ JSObject.prototype = {
         /** container for properties of 'instance' */
         this.instance = new JSObject('<instance of '+this.name+'>', this);
         this.instance.markAsInstance();
+        return this;
     },
 
     markAsInstance: function () {
         this.isInstance = true;
+        return this;
     },
 
     markAsFunction:function (node) {
@@ -36,6 +38,7 @@ JSObject.prototype = {
         this.isFunction = true;
         this.node = node;
         node && (node.obj = this);
+        return this;
     },
 
 //    markAsReference:function (ref) {
@@ -48,6 +51,7 @@ JSObject.prototype = {
     addField: function (name) {
         if (this.fields[name]) return;
         this.fields[name] = new JSObject(name, this);
+        return this;
     },
 
     getChild: function (name) {

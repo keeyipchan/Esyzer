@@ -1,6 +1,6 @@
 'use strict';
 var esprima = require('esprima');
-var analyzer = require('../analyzer');
+var analyzer = require('../analyzer').analyzer;
 var ast;
 
 exports.scope_creation = {
@@ -46,35 +46,6 @@ exports.scope_creation = {
         test.done();
     }
 
-};
-
-exports.scope_linking = {
-    linkAtoB:function (test) {
-        ast = esprima.parse('var a,b;' +
-            'a=b;');
-        analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking a=b');
-
-        test.done();
-    },
-    linkAtoBInDeclaration:function (test) {
-        ast = esprima.parse('var b;' +
-            'var a=b;');
-        analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking var a=b');
-
-        test.done();
-    },
-    linkAtoOutsideB:function (test) {
-        ast = esprima.parse('var b;' +
-            'function ttt() {' +
-            'var a=b;' +
-            '}');
-        analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
-
-        test.done();
-    }
 };
 
 exports.mutating = {
@@ -159,7 +130,60 @@ exports.class_analysis = {
         test.ok(ast.scope.names['c'].instance.fields.x !== undefined, 'create property on \'this.x\' in constructor');
         test.ok(ast.scope.names['c'].instance.fields.y !== undefined, 'create property on \'this.x\' in method');
         test.done();
+    },
+
+    classPrediction: function (test) {
+        ast = esprima.parse('\
+            var a = new c;\
+            var c=function(){};\
+        ');
+
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].isClass, 'Create class on guess');
+        test.done();
+    }
+};
+
+exports.linking = {
+    linkAtoB:function (test) {
+        ast = esprima.parse('var a,b;' +
+            'a=b;');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking a=b');
+
+        test.done();
+    },
+    linkAtoBInDeclaration:function (test) {
+        ast = esprima.parse('var b;' +
+            'var a=b;');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking var a=b');
+
+        test.done();
+    },
+    linkAtoOutsideB:function (test) {
+        ast = esprima.parse('var b;' +
+            'function ttt() {' +
+            'var a=b;' +
+            '}');
+        analyzer.analyze(ast);
+        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
+
+        test.done();
+    },
+
+    linkToClass: function (test) {
+        ast = esprima.parse(
+            'var B = function () {this.x= new ttt;};' +
+            'function ttt() {' +
+            'var a=new B;' +
+            '}'
+        );
+        analyzer.analyze(ast);
+        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['B'], 'name linking to class');
+        test.ok(ast.scope.names['B'].instance.x.ref === ast.scope.names['ttt'], 'name linking to class');
+
+        test.done();
     }
 
 };
-
