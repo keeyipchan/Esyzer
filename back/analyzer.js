@@ -72,7 +72,8 @@ Analyzer.prototype = {
 
                     //this.x inside constructor
                     if (node.property.type == 'Identifier') {
-                        var field = obj.instance.addField(node.property.name);
+                        obj.instance.addField(node.property.name);
+                        return obj.instance.getChild(node.property.name);
                     }
                 }
 
