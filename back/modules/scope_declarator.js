@@ -24,6 +24,37 @@ ScopeDeclarator.prototype = {
         ast.scope = ast.scope || new Scope(undefined, ast);
         this.context.scopeChain = [ast.scope];
     },
+    mutateVariableDeclaration: function (node) {
+        var declarations = node.declarations;
+        var assignments = [];
+        var i;
+        delete node.declarations;
+        delete node.kind;
+        for (i=0;i<declarations.length;i++) {
+            var v = this.analyzer.getScope().addVar(declarations[i].id.name);
+            if (declarations[i].init) {
+//                if (v.ref) throw 'Multiple referencing';
+                assignments.push({
+                    "type": "ExpressionStatement",
+                    "expression": {
+                        "type": "AssignmentExpression",
+                        "operator": "=",
+                        "left": declarations[i].id,
+                        "right": declarations[i].init
+                    }
+                })
+            }
+        }
+        if (assignments.length) {
+            node.type = "BlockStatement";
+            node.body = [];
+            for (i=0;i<assignments.length;i++) {
+                node.body.push(assignments[i]);
+            }
+        } else {
+            node.type = "EmptyStatement";
+        }
+    },
     enter:function (node) {
         switch (node.type) {
             case 'FunctionDeclaration':
@@ -35,17 +66,20 @@ ScopeDeclarator.prototype = {
                     node.scope.addVar(node.params[i].name)
                 break;
 
-            case 'VariableDeclarator':
-                var v = this.analyzer.getScope().addVar(node.id.name);
-                if (node.init) {
-                    if (v.ref) throw 'Multiple referencing';
-                    var init = this.analyzer.getObjectRef(node.init);
-                    if (init) {
-                        v.ref = init
-                    }
-
-                }
-                break;
+            case 'VariableDeclaration':
+                this.mutateVariableDeclaration(node);
+                return 3; //retry
+//            case 'VariableDeclarator':
+//                var v = this.analyzer.getScope().addVar(node.id.name);
+//                if (node.init) {
+//                    if (v.ref) throw 'Multiple referencing';
+//                    var init = this.analyzer.getObjectRef(node.init);
+//                    if (init) {
+//                        v.ref = init
+//                    }
+//
+//                }
+//                break;
         }
 
     },

@@ -4,6 +4,7 @@ var visitor = require('./node_visitor');
 var JSObject = require('./jsobject').JSObject;
 var Scope = require('./Scope').Scope;
 var ScopeDeclarator = require('./modules/scope_declarator.js').ScopeDeclarator;
+var BasicMutator = require('./modules/basic_mutator.js').BasicMutator;
 
 
 //--------------------------------------
@@ -15,7 +16,8 @@ var Analyzer = function () {
 
 
     this.passes = [
-        new ScopeDeclarator(this)
+        new ScopeDeclarator(this),
+        new BasicMutator(this)
     ];
 
 };
@@ -40,23 +42,23 @@ Analyzer.prototype = {
         var obj;
 
         if (node.type == 'Identifier') {
-            return getScope().getObject(node.name)
+            return this.getScope().getObject(node.name)
         }
         if (node.type == 'NewExpression') {
-            return getObjectRef(node.callee);
+            return this.getObjectRef(node.callee);
         }
 
         if (node.type == 'MemberExpression') {
-            if (isPrototype(node.object) && node.property.type == 'Identifier') {
+            if (this.isPrototype(node.object) && node.property.type == 'Identifier') {
                 //a.x.prototype.b ....
-                obj = getObjectRef(node.object.object);
+                obj = this.getObjectRef(node.object.object);
 
                 obj.markAsClass();
                 obj.instance.addField(node.property.name);
                 return obj.instance.getChild(node.property.name);
             } else if (node.object.type == 'ThisExpression') {
                 //this.x
-                obj = getScope().node.obj;
+                obj = this.getScope().node.obj;
                 if (obj) {
                     if (!(obj.parent && obj.parent.isInstance)) obj.markAsClass();
                     else
@@ -77,8 +79,6 @@ Analyzer.prototype = {
 
     enterNode:function (node) {
         switch (node.type) {
-
-
             case 'AssignmentExpression':
                 var left = getObjectRef(node.left);
                 if (!left) break;

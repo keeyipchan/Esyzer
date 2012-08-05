@@ -3,7 +3,12 @@ var esprima = require('esprima');
 var analyzer = require('../analyzer').analyzer;
 var ast;
 
+ast = esprima.parse('var d=1;');
+analyzer.analyze(ast);
+
+
 exports.scope_creation = {
+
     createScope:function (test) {
         ast = esprima.parse(';');
         analyzer.analyze(ast);
@@ -56,7 +61,7 @@ exports.mutating = {
         ');
         analyzer.analyze(ast);
         test.ok(ast.scope.names['x'].isFunction, 'Deanonimizing function in variable declaration');
-        test.ok(ast.scope.names['x'].node == ast.body[0].declarations[1].init, 'Node saving in variable declaration');
+        test.ok(ast.scope.names['x'].node.type == 'FunctionExpression', 'Node saving in variable declaration');
         test.ok(ast.scope.names['c'].isFunction, 'Deanonimizing function in assignment expression');
         test.ok(ast.scope.names['c'].node == ast.body[1].expression.right, 'Node saving in in assignment expression');
         test.done();

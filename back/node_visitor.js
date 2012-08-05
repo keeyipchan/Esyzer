@@ -30,6 +30,7 @@
         Keys,
         Break,
         Skip,
+        Retry,
         isArray;
 
     Syntax = {
@@ -127,6 +128,7 @@
 
     Break = 1;
     Skip = 2;
+    Retry = 3;
 
     function traverse(top, visitor) {
         var worklist, leavelist, node, ret, current, current2, candidates, candidate;
@@ -144,8 +146,8 @@
                     return;
                 }
 
-                if (typeof ret === 'object' && ret.mutated) {
-                    worklist.push(ret.node);
+                if (ret === Retry) {
+                    worklist.push(node);
                     continue;
                 }
                 worklist.push(null);
