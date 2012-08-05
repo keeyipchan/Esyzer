@@ -1,8 +1,6 @@
 "use strict";
 /**
  * @module
- *  preparing an ast for analyze
- *  add a 'parent' to each node for intensive traverse
  */
 
 var Scope = require('../scope').Scope;
@@ -10,12 +8,12 @@ var Scope = require('../scope').Scope;
 /**
  * @constructor
  */
-var ASTPrepare = function (analyzer) {
+var PASS = function (analyzer) {
     this.analyzer = analyzer;
     this.context = analyzer.context;
 };
 
-ASTPrepare.prototype = {
+PASS.prototype = {
     init:function (ast) {
     },
     enter:function (node) {
@@ -25,4 +23,4 @@ ASTPrepare.prototype = {
 };
 
 
-exports.ASTPrepare = ASTPrepare;
+exports.PASS = PASS;

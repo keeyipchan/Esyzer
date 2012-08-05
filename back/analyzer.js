@@ -5,6 +5,7 @@ var JSObject = require('./jsobject').JSObject;
 var Scope = require('./Scope').Scope;
 var ScopeDeclarator = require('./modules/scope_declarator.js').ScopeDeclarator;
 var BasicMutator = require('./modules/basic_mutator.js').BasicMutator;
+var BasicLinker = require('./modules/basic_linker.js').BasicLinker;
 
 
 //--------------------------------------
@@ -17,7 +18,8 @@ var Analyzer = function () {
 
     this.passes = [
         new ScopeDeclarator(this),
-        new BasicMutator(this)
+        new BasicMutator(this),
+        new BasicLinker(this)
     ];
 
 };

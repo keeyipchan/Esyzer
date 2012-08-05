@@ -189,8 +189,8 @@ exports.linking = {
             '}'
         );
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['B'], 'name linking to class');
-        test.ok(ast.scope.names['B'].instance.x.ref === ast.scope.names['ttt'], 'name linking to class');
+        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['B'], 'name linking to class on "new"');
+        test.ok(ast.scope.names['B'].instance.fields.x.ref === ast.scope.names['ttt'], 'property linking to class');
 
         test.done();
     }
