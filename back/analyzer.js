@@ -23,8 +23,12 @@ var Analyzer = function () {
 };
 
 Analyzer.prototype = {
-    getScope:function () {
-        return this.context.scopeChain[this.context.scopeChain.length - 1];
+    getScope:function (node) {
+        var x=1;
+        while (!node.scope) {
+            node = node.parent
+        }
+        return node.scope;
     },
 
     /**
@@ -33,7 +37,7 @@ Analyzer.prototype = {
      */
     isPrototype:function (node) {
         if (node.type !== 'MemberExpression') return false;
-        return node.property.type == 'Identifier' && node.property.name == 'prototype' && getObjectRef(node.object);
+        return node.property.type == 'Identifier' && node.property.name == 'prototype' && this.getObjectRef(node.object);
     },
 
 
@@ -42,7 +46,7 @@ Analyzer.prototype = {
         var obj;
 
         if (node.type == 'Identifier') {
-            return this.getScope().getObject(node.name)
+            return this.getScope(node).getObject(node.name)
         }
         if (node.type == 'NewExpression') {
             return this.getObjectRef(node.callee);
@@ -58,7 +62,7 @@ Analyzer.prototype = {
                 return obj.instance.getChild(node.property.name);
             } else if (node.object.type == 'ThisExpression') {
                 //this.x
-                obj = this.getScope().node.obj;
+                obj = this.getScope(node).node.obj;
                 if (obj) {
                     if (!(obj.parent && obj.parent.isInstance)) obj.markAsClass();
                     else
@@ -79,32 +83,27 @@ Analyzer.prototype = {
 
     enterNode:function (node) {
         switch (node.type) {
-            case 'AssignmentExpression':
-                var left = getObjectRef(node.left);
-                if (!left) break;
-                if (left.ref) throw 'Multiple referencing';
-                var right = getObjectRef(node.right);
-                if (right) {
-                    left.ref = right;
-                } else if (node.right.type == 'FunctionExpression') {
-                    //vx=function () {};
-                    left.markAsFunction(node.right);
-                }
-                break;
+//            case 'AssignmentExpression':
+//                var left = getObjectRef(node.left);
+//                if (!left) break;
+//                if (left.ref) throw 'Multiple referencing';
+//                var right = getObjectRef(node.right);
+//                if (right) {
+//                    left.ref = right;
+//                } else if (node.right.type == 'FunctionExpression') {
+//                    //vx=function () {};
+//                    left.markAsFunction(node.right);
+//                }
+//                break;
 
-            case 'NewExpression':
-                var obj = getObjectRef(node.callee);
-                if (!obj) break;
-                obj.markAsClass();
-                break;
 
-            case 'MemberExpression':
-                obj = getObjectRef(node.object);
-                if (!obj) break;
-                if (node.property.type == 'Identifier' && node.property.name == 'prototype') {
-                    obj.markAsClass();
-                }
-                break;
+//            case 'MemberExpression':
+//                obj = getObjectRef(node.object);
+//                if (!obj) break;
+//                if (node.property.type == 'Identifier' && node.property.name == 'prototype') {
+//                    obj.markAsClass();
+//                }
+//                break;
         }
     },
 

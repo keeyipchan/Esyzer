@@ -31,7 +31,7 @@ ScopeDeclarator.prototype = {
         delete node.declarations;
         delete node.kind;
         for (i=0;i<declarations.length;i++) {
-            var v = this.analyzer.getScope().addVar(declarations[i].id.name);
+            var v = this.analyzer.getScope(node).addVar(declarations[i].id.name);
             if (declarations[i].init) {
 //                if (v.ref) throw 'Multiple referencing';
                 assignments.push({
@@ -58,7 +58,7 @@ ScopeDeclarator.prototype = {
     enter:function (node) {
         switch (node.type) {
             case 'FunctionDeclaration':
-                this.analyzer.getScope().getObject(node.id.name).markAsFunction();
+                this.analyzer.getScope(node).getObject(node.id.name).markAsFunction();
             case 'FunctionExpression':
                 node.scope = new Scope(this.context.scopeChain[this.context.scopeChain.length - 1], node);
                 this.context.scopeChain.push(node.scope);

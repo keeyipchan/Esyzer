@@ -163,10 +163,12 @@
                                 current2 = candidate.length;
                                 while ((current2 -= 1) >= 0) {
                                     if (candidate[current2]) {
+                                        if (!candidate[current2].parent) candidate[current2].parent = node;
                                         worklist.push(candidate[current2]);
                                     }
                                 }
                             } else {
+                                if (!candidate.parent) candidate.parent = node;
                                 worklist.push(candidate);
                             }
                         }
