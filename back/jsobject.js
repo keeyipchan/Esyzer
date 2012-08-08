@@ -49,9 +49,9 @@ JSObject.prototype = {
 //    },
 
     addField: function (name) {
-        if (this.fields[name]) return;
+        if (this.fields[name]) return this.fields[name];
         this.fields[name] = new JSObject(name, this);
-        return this;
+        return this.fields[name];
     },
 
     getChild: function (name) {

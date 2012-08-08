@@ -3,9 +3,9 @@
 var visitor = require('./node_visitor');
 var JSObject = require('./jsobject').JSObject;
 var Scope = require('./Scope').Scope;
-var ScopeDeclarator = require('./modules/scope_declarator.js').ScopeDeclarator;
-var BasicMutator = require('./modules/basic_mutator.js').BasicMutator;
-var BasicLinker = require('./modules/basic_linker.js').BasicLinker;
+var ScopeDeclarator = require('./ext/scope_declarator').ScopeDeclarator;
+var BasicMutator = require('./ext/basic_mutator').BasicMutator;
+var BasicLinker = require('./ext/basic_linker').BasicLinker;
 
 
 //--------------------------------------
@@ -24,8 +24,8 @@ var Analyzer = function () {
 };
 
 Analyzer.prototype = {
-    getScope:function (node) {
-        var x=1;
+    getScope: function (node) {
+        var x = 1;
         while (!node.scope) {
             node = node.parent
         }
@@ -36,14 +36,14 @@ Analyzer.prototype = {
      *  indicates the result of evaluating node is 'prototype' property of object
      * @param node
      */
-    isPrototype:function (node) {
+    isPrototype: function (node) {
         if (node.type !== 'MemberExpression') return false;
         return node.property.type == 'Identifier' && node.property.name == 'prototype' && this.getObjectRef(node.object);
     },
 
 
     /** get the object referenced by node. Try to create objects and properties */
-    getObjectRef:function (node) {
+    getObjectRef: function (node) {
         var obj;
 
         if (node.type == 'Identifier') {
@@ -53,29 +53,34 @@ Analyzer.prototype = {
             return this.getObjectRef(node.callee);
         }
 
+        if (node.type == 'ThisExpression') {
+            //this.x
+            obj = this.getScope(node).node.obj;
+            if (obj) {
+                if (!(obj.parent && obj.parent.isInstance)) obj.markAsClass();
+                else obj = obj.parent.parent;
+                return obj;
+            }
+            return null
+        }
+
         if (node.type == 'MemberExpression') {
             if (this.isPrototype(node.object) && node.property.type == 'Identifier') {
                 //a.x.prototype.b ....
                 obj = this.getObjectRef(node.object.object);
 
                 obj.markAsClass();
-                obj.instance.addField(node.property.name);
-                return obj.instance.getChild(node.property.name);
-            } else if (node.object.type == 'ThisExpression') {
-                //this.x
-                obj = this.getScope(node).node.obj;
-                if (obj) {
-                    if (!(obj.parent && obj.parent.isInstance)) obj.markAsClass();
-                    else
-                        obj = obj.parent.parent;
-
-                    //this.x inside constructor
-                    if (node.property.type == 'Identifier') {
-                        obj.instance.addField(node.property.name);
-                        return obj.instance.getChild(node.property.name);
-                    }
-                }
-
+                return obj.instance.addField(node.property.name);
+//                return obj.instance.getChild(node.property.name);
+            } else if (node.object.type === 'ThisExpression' && node.property.type == 'Identifier') {
+                //this.x inside constructor
+                obj = this.getObjectRef(node.object);
+                return obj.instance.addField(node.property.name);
+//                return obj.instance.getChild(node.property.name);
+            } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype'){
+                //something.x
+                obj = this.getObjectRef(node.object);
+                return obj.addField(node.property.name);
             }
 
         }
@@ -83,7 +88,7 @@ Analyzer.prototype = {
         return null;
     },
 
-    analyze:function (ast) {
+    analyze: function (ast) {
         for (var i = 0; i < this.passes.length; i++) {
             this.passes[i].init(ast);
             visitor.traverse(ast, this.passes[i]);

@@ -1,32 +1,32 @@
 'use strict';
-var esprima = require('esprima');
+var parse = require('esprima').parse;
 var analyzer = require('../analyzer').analyzer;
-var ast;
 
+var ast, src;
 
 exports.scope_creation = {
 
     createScope:function (test) {
-        ast = esprima.parse(';');
+        ast = parse(';');
         analyzer.analyze(ast);
         test.ok('scope' in ast, 'Global scope creation');
         test.done();
     },
     createFunctionScope:function (test) {
-        ast = esprima.parse('function asd() {};');
+        ast = parse('function asd() {};');
         analyzer.analyze(ast);
         test.ok('scope' in ast.body[0], 'function scope creation');
         test.equal(ast.body[0].scope.parent, ast.scope, 'function scope parent');
         test.done();
     },
     createFunctionExpressionScope:function (test) {
-        ast = esprima.parse('!function () {};');
+        ast = parse('!function () {};');
         analyzer.analyze(ast);
         test.ok('scope' in ast.body[0].expression.argument, 'function scope creation');
         test.done();
     },
     declareVarInScope:function (test) {
-        ast = esprima.parse('var a;');
+        ast = parse('var a;');
         analyzer.analyze(ast);
         test.ok(ast.scope.names !== undefined, 'Identifiers must be in in scope');
         test.ok('a' in ast.scope.names, 'Create identifier in scope');
@@ -34,14 +34,14 @@ exports.scope_creation = {
         test.done();
     },
     declareFunctionNameInScope:function (test) {
-        ast = esprima.parse('function asd() {};');
+        ast = parse('function asd() {};');
         analyzer.analyze(ast);
         test.ok('asd' in ast.scope.names);
         test.ok(ast.scope.names['asd'].name === 'asd', 'Store name as a property');
         test.done();
     },
     declareArgumentsInScope:function (test) {
-        ast = esprima.parse('var a;function asd(a,b) {};');
+        ast = parse('var a;function asd(a,b) {};');
         analyzer.analyze(ast);
         test.ok('a' in ast.body[1].scope.names, 'Create function argument in scope');
         test.ok('b' in ast.body[1].scope.names, 'Create function argument in scope');
@@ -52,7 +52,7 @@ exports.scope_creation = {
 
 exports.mutating = {
     anonymousExpressionFuncNaming:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var c,x=function(){};\
             c = function (){}\
         ');
@@ -64,7 +64,7 @@ exports.mutating = {
         test.done();
     },
     assigningObjectToFunctionNode:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var c = function () {},d;\
             d = function () {};\
         ');
@@ -78,7 +78,7 @@ exports.mutating = {
 
 exports.class_analysis = {
     convertToClassOnNew:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var o,c=function(){};\
             o = new c();\
         ');
@@ -87,7 +87,7 @@ exports.class_analysis = {
         test.done();
     },
     convertToClassOnPrototype:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var o,c=function(){};\
             c.prototype.x = function() {}; \
         ');
@@ -97,7 +97,7 @@ exports.class_analysis = {
     },
 
     convertToClassOnThisInConstructor:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var c=function(){\
                     this.x=1;\
                 },d;\
@@ -112,7 +112,7 @@ exports.class_analysis = {
     },
 
     classicPrototypeMethod:function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var c=function(){};\
             c.prototype.t = function (){}\
         ');
@@ -124,7 +124,7 @@ exports.class_analysis = {
     },
 
     trivialProperty:function (test){
-        ast = esprima.parse('\
+        ast = parse('\
             var c=function(){this.x=1};\
             c.prototype.t = function (){this.y=2;}\
         ');
@@ -135,7 +135,7 @@ exports.class_analysis = {
     },
 
     classPrediction: function (test) {
-        ast = esprima.parse('\
+        ast = parse('\
             var a = new c;\
             var c=function(){};\
         ');
@@ -148,7 +148,7 @@ exports.class_analysis = {
 
 exports.linking = {
     linkAtoB:function (test) {
-        ast = esprima.parse('var a,b;' +
+        ast = parse('var a,b;' +
             'a=b;');
         analyzer.analyze(ast);
         test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking a=b');
@@ -156,7 +156,7 @@ exports.linking = {
         test.done();
     },
     linkAtoBInDeclaration:function (test) {
-        ast = esprima.parse('var b;' +
+        ast = parse('var b;' +
             'var a=b;');
         analyzer.analyze(ast);
         test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking var a=b');
@@ -164,7 +164,7 @@ exports.linking = {
         test.done();
     },
     linkAtoOutsideB:function (test) {
-        ast = esprima.parse('var b;' +
+        ast = parse('var b;' +
             'function ttt() {' +
             'var a=b;' +
             '}');
@@ -175,7 +175,7 @@ exports.linking = {
     },
 
     linkToClass: function (test) {
-        ast = esprima.parse(
+        ast = parse(
             'var B = function () {this.x= new ttt;};' +
             'function ttt() {' +
             'var a=new B;' +
@@ -189,3 +189,4 @@ exports.linking = {
     }
 
 };
+
