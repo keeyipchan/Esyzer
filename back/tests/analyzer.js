@@ -2,13 +2,6 @@
 var esprima = require('esprima');
 var analyzer = require('../analyzer').analyzer;
 var ast;
-ast = esprima.parse('var a;function asd(a,b) {};');
-try {
-analyzer.analyze(ast);
-}catch(e) {
-    var x=2;
-}
-var x=1;
 
 
 exports.scope_creation = {

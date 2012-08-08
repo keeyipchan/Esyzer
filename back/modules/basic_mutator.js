@@ -18,8 +18,6 @@ var BasicMutator = function (analyzer) {
 
 BasicMutator.prototype = {
     init:function (ast) {
-        ast.scope = ast.scope || new Scope(undefined, ast);
-        this.context.scopeChain = [ast.scope];
     },
     enter:function (node) {
         switch (node.type) {

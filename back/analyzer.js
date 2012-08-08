@@ -12,7 +12,6 @@ var BasicLinker = require('./modules/basic_linker.js').BasicLinker;
 
 var Analyzer = function () {
     this.context = {
-        scopeChain:[]
     };
 
 
@@ -83,33 +82,6 @@ Analyzer.prototype = {
 
         return null;
     },
-
-    enterNode:function (node) {
-        switch (node.type) {
-//            case 'AssignmentExpression':
-//                var left = getObjectRef(node.left);
-//                if (!left) break;
-//                if (left.ref) throw 'Multiple referencing';
-//                var right = getObjectRef(node.right);
-//                if (right) {
-//                    left.ref = right;
-//                } else if (node.right.type == 'FunctionExpression') {
-//                    //vx=function () {};
-//                    left.markAsFunction(node.right);
-//                }
-//                break;
-
-
-//            case 'MemberExpression':
-//                obj = getObjectRef(node.object);
-//                if (!obj) break;
-//                if (node.property.type == 'Identifier' && node.property.name == 'prototype') {
-//                    obj.markAsClass();
-//                }
-//                break;
-        }
-    },
-
 
     analyze:function (ast) {
         for (var i = 0; i < this.passes.length; i++) {
