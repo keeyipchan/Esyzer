@@ -2,7 +2,7 @@
 "use strict";
 var visitor = require('./node_visitor');
 var JSObject = require('./jsobject').JSObject;
-var Scope = require('./Scope').Scope;
+var Scope = require('./scope').Scope;
 var ScopeDeclarator = require('./ext/scope_declarator').ScopeDeclarator;
 var BasicMutator = require('./ext/basic_mutator').BasicMutator;
 var BasicLinker = require('./ext/basic_linker').BasicLinker;

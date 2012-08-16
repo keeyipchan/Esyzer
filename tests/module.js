@@ -1,4 +1,4 @@
-var getModule = require('../module').getModule;
+var getModule = require('../analyzer/module').getModule;
 
 exports.module = {
     createModule: function (test) {

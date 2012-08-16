@@ -1,6 +1,6 @@
 "use strict";
 var parse = require('esprima').parse;
-var analyzer = require('./analyzer').analyzer;
+var analyzer = require('./analyzer.js').analyzer;
 
 var modules = {};
 

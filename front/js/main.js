@@ -1,10 +1,9 @@
 'use strict';
 
-define(['sceneManager', 'objectModel', 'objectCollection', 'app', 'connection'], function (SceneManager, ObjectModel, ObjectCollection, App, Connection){
-    var sceneManager = new SceneManager($('#viewport'));
-    var connection = new Connection('http://localhost:8000/data');
+define(['models/objectCollection', 'app', 'connection'],
+    function (ObjectCollection, App, Connection){
+    var connection = new Connection('http://localhost:3000/rest');
     var app = new App({
-        sceneManager: sceneManager,
         connection: connection
     });
 
