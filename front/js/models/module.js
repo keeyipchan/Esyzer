@@ -9,7 +9,7 @@
  */
 
 define( function (){
-    var ModuleModel = Backbone.Model.extend({
+    var Module = Backbone.Model.extend({
         defaults: function () {
             return {
                 name:'<NoName>',
@@ -18,5 +18,5 @@ define( function (){
         }
     });
 
-    return ModuleModel;
+    return Module;
 });

@@ -1,56 +1,22 @@
 'use strict';
 
-define(['models/module_collection', 'ui/module_view'], function (ObjectModel,ObjectCollection, ModuleView) {
+define(['models/modules', 'ui/module_panel'],
+    function (Modules, ModulePanel) {
     var App = function (options) {
-        this.sceneManager = options.sceneManager;
-        this.modules = new ObjectCollection();
-        this.moduleView = new ModuleView({
-            container: $('#moduleView'),
-            modules: this.modules}
-        );
-//        this.objects.on('add', this.onObjectAdd.bind(this));
+        this.$leftPanel = $('#leftPanel');
+        this.modules = new Modules();
+        this.modulePanel = new ModulePanel({modules: this.modules});
+        this.$leftPanel.append(this.modulePanel.$el);
 
-        this.objectViews = [];
-        this.connection = options.connection;
-//        this.connection.on('objectTreeLoaded', this.onObjectTreeLoaded.bind(this))
-//        this.classes = [];
+//        this.connection = options.connection;
+        this.start();
     };
 
     App.prototype = {
         start : function () {
-//            this.connection.loadObjectTree();
-
+            this.modules.fetch();
         }
-
-//        onObjectAdd:function (object) {
-//            var view = new ObjectView({model:object, manager:this.sceneManager});
-//            this.objectViews.push(view);
-//        },
-//        onObjectTreeLoaded:function (tree) {
-//            var flat = flattenTree(tree);
-//
-//            for (var i=0;i<flat.length;i++) {
-//                if (flat[i].type == 'class')  {
-//                    this.classes.push(flat[i]);
-//                    this.objects.add(new ObjectModel(flat[i]))
-//                }
-//            }
-//
-//        }
-//    };
-//
-//    //convert JSON tree to array of linked object models
-//    function flattenTree(root, parent) {
-//        var res = [];
-//        root.parent = parent || null;
-//        res.push(root);
-//        for (var f in root.fields) {
-//            var flat = flattenTree(root.fields[f], root);
-//            root.fields[f] = flat[0];
-//            res = res.concat(flat);
-//        }
-//        return res;
-    }
+    };
 
     return App;
 });
