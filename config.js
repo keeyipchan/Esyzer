@@ -1,3 +1,3 @@
 'use strict';
 
-exports.srcPath = '../src';
+exports.srcPath = __dirname + '/src';

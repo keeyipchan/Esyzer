@@ -5,7 +5,7 @@ var express = require('express');
 var app = express();
 var moduleLoader = require('./back/module_loader.js');
 
-app.get('/data/modules', moduleLoader.getModules);
+app.get('/data/modules', moduleLoader.getModuleList);
 
 app.get('/', function(req, res){
     res.sendfile(__dirname + '/front/index.html');
