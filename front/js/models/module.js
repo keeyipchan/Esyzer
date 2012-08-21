@@ -12,7 +12,7 @@ define( function (){
     var Module = Backbone.Model.extend({
         defaults: function () {
             return {
-                name:'<NoName>',
+                id:'<NoName>',
                 type: 'generic'
             }
         }

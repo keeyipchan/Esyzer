@@ -5,21 +5,25 @@ var q = require('q');
 
 var modules = undefined;
 
-function loadModuleList () {
-    if (modules) return;
-    var def = q.defer();
-    fs.readdir(config.srcPath, function (err, files) {
-        if (err) {
-            console.log('Error reading module files: ', err)
-        } else {
-            modules = files;
-            def.resolve();
-        }
-    });
-    return def.promise;
+var loadDefer = q.defer();
+
+function loadModuleList() {
+    if (!modules) {
+        fs.readdir(config.srcPath, function (err, files) {
+            if (err) {
+                console.log('Error reading module files: ', err)
+            } else {
+                modules = [];
+                for (var v in files)
+                    modules.push({id:files[v]});
+                loadDefer.resolve();
+            }
+        });
+    }
+    return loadDefer.promise;
 }
 
-exports.getModuleList = function (req, res) {
+exports.getModules = function (req, res) {
     loadModuleList().then(function () {
         res.send(modules);
     })
