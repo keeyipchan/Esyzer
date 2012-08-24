@@ -119,7 +119,21 @@ exports.class_analysis = {
         analyzer.analyze(ast);
         test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
         test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].instance.fields.t.node == ast.body[1].expression.right, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.fields.t.node == ast.body[1].expression.right, 'set correct node');
+        test.done();
+    },
+
+    objectLiteralPrototypeMethod:function (test) {
+        ast = parse('\
+            var c=function(){};\
+            c.prototype = {\
+              t: function aa(){}\
+            }\
+        ');
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.fields.t.node.id.name == 'aa', 'set correct node');
         test.done();
     },
 

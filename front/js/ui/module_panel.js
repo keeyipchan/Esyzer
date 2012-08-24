@@ -2,6 +2,7 @@
 
 
 define(function () {
+
     var ModulePanel = function (options) {
         this.$el = $('<div class="modulePanel scroll">');
         this.$header = $('<div class="header">Modules</div>').appendTo(this.$el);
@@ -14,10 +15,17 @@ define(function () {
         render: function () {
             this.$list.empty();
             this.modules.forEach(function (module) {
-                $('<li></li>').text(module.id).appendTo(this.$list);
+                $('<li></li>').text(module.id).appendTo(this.$list)
+                    .on('click', this.moduleClick.bind(this, module));
             }.bind(this))
+        },
+
+        moduleClick: function (module) {
+            module.select();
         }
     };
+
+
 
     return ModulePanel;
 });

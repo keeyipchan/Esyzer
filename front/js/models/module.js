@@ -15,6 +15,9 @@ define( function (){
                 id:'<NoName>',
                 type: 'generic'
             }
+        },
+        select : function () {
+            this.trigger('select', this);
         }
     });
 
