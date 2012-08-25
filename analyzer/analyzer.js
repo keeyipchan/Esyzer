@@ -65,7 +65,12 @@ Analyzer.prototype = {
         }
 
         if (node.type == 'MemberExpression') {
-            if (this.isPrototype(node.object) && node.property.type == 'Identifier') {
+            if (this.isPrototype(node)) {
+                //x.prototype
+                obj = this.getObjectRef(node.object);
+                obj.markAsClass();
+                return obj.instance;
+            } else if (this.isPrototype(node.object) && node.property.type == 'Identifier') {
                 //a.x.prototype.b ....
                 obj = this.getObjectRef(node.object.object);
 
@@ -77,7 +82,7 @@ Analyzer.prototype = {
                 obj = this.getObjectRef(node.object);
                 return obj.instance.addField(node.property.name);
 //                return obj.instance.getChild(node.property.name);
-            } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype'){
+            } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype') {
                 //something.x
                 obj = this.getObjectRef(node.object);
                 return obj.addField(node.property.name);

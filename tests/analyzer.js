@@ -123,17 +123,25 @@ exports.class_analysis = {
         test.done();
     },
 
-    objectLiteralPrototypeMethod:function (test) {
+    objectLiteralPrototype:function (test) {
         ast = parse('\
             var c=function(){};\
             c.prototype = {\
-              t: function aa(){}\
+              t: function aa(){},\
+              x: 1,\
+              "d d": 5\
             }\
         ');
         analyzer.analyze(ast);
+        test.ok(ast.scope.names['c'].isClass, 'mark as a class on prototype literal');
+        test.ok(ast.body[1].expression.right.obj == ast.scope.names['c'].instance, 'must link object node to instance in class');
         test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
         test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
         test.ok(ast.scope.names['c'].instance.fields.t.node.id.name == 'aa', 'set correct node');
+
+        test.ok(ast.scope.names['c'].instance.fields.x !== undefined, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.fields['d d'] !== undefined, 'create field in class');
+
         test.done();
     },
 
