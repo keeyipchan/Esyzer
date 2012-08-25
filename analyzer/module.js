@@ -19,7 +19,7 @@ var Module = function (id) {
 
 Module.prototype = {
     setSrc:function (src) {
-        this.ast = parse(src);
+        this.ast = parse(src, {loc:true});
         return this;
     },
     analyze: function () {

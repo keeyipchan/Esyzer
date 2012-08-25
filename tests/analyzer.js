@@ -212,3 +212,15 @@ exports.linking = {
 
 };
 
+
+exports.strange_things = {
+    ignoreProtoProperty: function(test) {
+        ast = parse(
+            'B.__proto__ = a;' +
+                'B.x=null;'
+        );
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['B'].fields.x.ref === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.done();
+    }
+};
