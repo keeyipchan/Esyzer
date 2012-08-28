@@ -22,7 +22,11 @@ Module.prototype = {
         return {
             id: this.id,
             names : this.ast.scope.toJSON()
-//            classes: this.classList
+        }
+    },
+    toShortJSON: function () {
+        return {
+            id: this.id
         }
     },
     setSrc:function (src) {

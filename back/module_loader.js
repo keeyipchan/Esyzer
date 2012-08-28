@@ -56,7 +56,7 @@ exports.getModules = function (req, res) {
     loadModuleList().then(function () {
         var mlist = [];
         for (var m in modules) {
-            mlist.push(modules[m]);
+            mlist.push(modules[m].toShortJSON());
         }
         res.send(mlist);
     }, function (err) {
