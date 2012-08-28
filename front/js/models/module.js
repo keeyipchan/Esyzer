@@ -8,8 +8,14 @@
  *  type
  */
 
-define( function (){
-    var Module = Backbone.Model.extend({
+define(['./js_object', './js_objects'], function (JSObject, JSObjects){
+    var Module = Backbone.RelationalModel.extend({
+        relations: [{
+            type: Backbone.HasMany,
+            key: 'names',
+            relatedModel: JSObject,
+            collectionType: JSObjects
+        }],
         defaults: function () {
             return {
                 id:'<NoName>',

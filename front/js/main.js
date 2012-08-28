@@ -2,7 +2,7 @@
 
 define(['app'],
     function (App){
-    var app = new App;
+    window.app = new App;
 
 //    sceneManager.render();
 });

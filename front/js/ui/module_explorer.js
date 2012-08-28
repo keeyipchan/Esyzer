@@ -10,12 +10,19 @@ define(function () {
 
         this.modules = options.modules;
         this.modules.on('select', this.showModule, this);
+        this.module = undefined;
     };
 
     ModuleExplorer.prototype = {
         showModule: function (module) {
             this.$header.text(module.id);
+            if (this.module) this.module.off(null,null,this);
+            this.module = module;
+            this.module.on('all', this._onModule,this);
             module.fetch();
+        },
+        _onModule : function (m) {
+            console.log(arguments);
         }
     };
 
