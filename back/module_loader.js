@@ -66,8 +66,13 @@ exports.getModules = function (req, res) {
 
 exports.getModule = function (req, res) {
     loadModule(req.params.id).then(function () {
-        res.send(module);
-    }, function (err) {
+        try {
+        var obj =modules[req.params.id];
+        res.send(obj.toJSON());
+        }catch (e) {
+            console.log('Error in getModule:', e.message);
+        }
+    }).fail(function (err) {
         res.send(err);
     })
 };

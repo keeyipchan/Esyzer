@@ -1,5 +1,7 @@
 "use strict";
 
+var _ = require('underscore');
+
 /** Represents all objects - functions, classes, properties, etc.
  *  can combine different types. (class+function) (function + method)
  *   a JS Objects:
@@ -57,6 +59,15 @@ JSObject.prototype = {
     getChild: function (name) {
         //todo: implement 'deep' search (name = a.b.c)
         return this.fields[name];
+    },
+    toJSON: function() {
+        return {
+            name: this.name,
+            fields: _.map(this.fields, function (val) {
+                return val.toJSON();
+            }),
+            isClass: this.isClass
+        }
     }
 
 };

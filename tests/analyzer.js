@@ -13,10 +13,13 @@ exports.scope_creation = {
         test.done();
     },
     createFunctionScope:function (test) {
-        ast = parse('function asd() {};');
+        ast = parse('function asd() {} function asd2() {};');
         analyzer.analyze(ast);
         test.ok('scope' in ast.body[0], 'function scope creation');
         test.equal(ast.body[0].scope.parent, ast.scope, 'function scope parent');
+        test.equal(ast.body[1].scope.parent, ast.scope, 'check correct exit from function scope');
+        test.equal(ast.scope.inner.length, 2, 'Add inner scope');
+//        test.equal(ast.body[0].scope.inner, ast.scope.inner[0], 'Store function scope');
         test.done();
     },
     createFunctionExpressionScope:function (test) {
@@ -217,6 +220,15 @@ exports.strange_things = {
     ignoreProtoProperty: function(test) {
         ast = parse(
             'B.__proto__ = a;' +
+                'B.x=null;'
+        );
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['B'].fields.x.ref === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.done();
+    },
+    ignoreProtoPrototypeProperty: function(test) {
+        ast = parse(
+            'B.prototype.__proto__ = a;' +
                 'B.x=null;'
         );
         analyzer.analyze(ast);

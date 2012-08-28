@@ -65,6 +65,8 @@ Analyzer.prototype = {
         }
 
         if (node.type == 'MemberExpression') {
+            //completelly ignore `__proto__` as a property in member expression
+            if (node.property.name == '__proto__') return null;
             if (this.isPrototype(node)) {
                 //x.prototype
                 obj = this.getObjectRef(node.object);
@@ -82,7 +84,7 @@ Analyzer.prototype = {
                 obj = this.getObjectRef(node.object);
                 return obj.instance.addField(node.property.name);
 //                return obj.instance.getChild(node.property.name);
-            } else if (node.property.type == 'Identifier' && ['prototype','__proto__'].indexOf(node.property.name) == -1) {
+            } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype') {
                 //something.x
                 obj = this.getObjectRef(node.object);
                 return obj.addField(node.property.name);

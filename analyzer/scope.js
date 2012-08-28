@@ -1,6 +1,7 @@
 'use strict';
 
 var JSObject = require('./jsobject.js').JSObject;
+var _ = require('underscore');
 
 /**
  *  Represents current scope and executional context
@@ -11,7 +12,10 @@ var JSObject = require('./jsobject.js').JSObject;
 function Scope(parent, node) {
     this.parent = parent || null;
     this.node = node;
+    //inner scopes
+    this.inner = [];
 
+    if (parent) parent.inner.push(this);
     /** hash of names
      * each name is an JSObject
      */
@@ -33,6 +37,11 @@ Scope.prototype = {
         if (this.names[name]) return this.names[name];
         if (this.parent) return this.parent.getObject(name);
         return this.addVar(name);
+    },
+    toJSON: function () {
+        return _.map(this.names, function (val, key) {
+            return val.toJSON();
+        });
     }
 };
 

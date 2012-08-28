@@ -16,13 +16,15 @@ var Scope = require('../scope').Scope;
  */
 var ScopeDeclarator = function (analyzer) {
     this.analyzer = analyzer;
-    this.scopeChain = [];
+//    this.scopeChain = [];
+    this.scope = undefined;
 };
 
 ScopeDeclarator.prototype = {
     init:function (ast) {
-        ast.scope = ast.scope || new Scope(undefined, ast);
-        this.scopeChain = [ast.scope];
+        this.scope = ast.scope = ast.scope || new Scope(undefined, ast);
+
+//        this.scopeChain = [ast.scope];
     },
     mutateVariableDeclaration: function (node) {
         var declarations = node.declarations;
@@ -60,8 +62,9 @@ ScopeDeclarator.prototype = {
             case 'FunctionDeclaration':
                 this.analyzer.getScope(node).getObject(node.id.name).markAsFunction();
             case 'FunctionExpression':
-                node.scope = new Scope(this.scopeChain[this.scopeChain.length - 1], node);
-                this.scopeChain.push(node.scope);
+                this.scope = node.scope = new Scope(this.scope, node);
+//                this.scopeChain.push(node.scope);
+
                 for (var i = 0; i < node.params.length; i++)
                     node.scope.addVar(node.params[i].name)
                 break;
@@ -76,7 +79,8 @@ ScopeDeclarator.prototype = {
         switch (node.type) {
             case 'FunctionDeclaration':
             case 'FunctionExpression':
-                this.scopeChain.pop();
+//                this.scopeChain.pop();
+                this.scope = this.scope.parent;
                 break;
         }
     }
