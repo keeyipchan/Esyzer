@@ -13,7 +13,9 @@ define(function () {
             this.render();
         },
         render: function () {
-            this.$el.text(this.model.get('name'));
+            var title = this.model.get('name');
+            if (this.model.get('isClass') === true) title='<class> '+title;
+            this.$el.text(title);
             if (this.model.get('fields').length) {
                 this.$childs = $('<ul></ul>').appendTo(this.$el);
                 this.model.get('fields').forEach(function (m) {
