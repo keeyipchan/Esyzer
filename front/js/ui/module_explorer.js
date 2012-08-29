@@ -18,6 +18,7 @@ define(['./object_tree_node'], function (ObjectTreeNode) {
             this.$header.text(module.id);
             if (this.module) this.module.off(null, null, this);
             this.module = module;
+            this.$list.empty();
 //            this.module.on('all', function (m) { console.log(arguments); });
             this.module.on('add:names', this._onModuleNameAdd, this);
             module.fetch();
