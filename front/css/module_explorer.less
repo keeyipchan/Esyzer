@@ -1,0 +1,81 @@
+.moduleExplorer {
+    border: 1px solid #ccc;
+    height: 100%;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+
+    .header {
+        height: 30px;
+        line-height: 30px;
+        padding: 0 10px;
+        display: table-row;
+    }
+}
+
+.objectList {
+    overflow: auto;
+    display: table-cell;
+    white-space: nowrap;
+}
+
+.objectTreeNode {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    position: relative;
+    padding:20px 10px 0 10px;
+
+    & > div {
+        display: inline-block;
+        padding: 10px;
+        border: 1px solid #aac;
+        border-radius: 3px;
+    }
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right:50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
+    &::after {
+        right:auto;
+        left:50%;
+        border-left: 1px solid #ccc;
+    }
+
+    &:only-child {
+        padding-top: 0;
+    }
+    &:only-child:before, &:only-child:after {
+        display: none;
+    }
+
+    &:first-child:before, &:last-child:after {
+        border: none;
+    }
+
+    &:last-child:before {
+        border-right: 1px solid #ccc;
+    }
+
+    ul {
+        white-space: nowrap;
+        margin-top: 20px;
+        position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left:50%;
+            border-left: 1px solid #ccc;
+            width: 0;
+            height: 20px;
+        }
+    }
+}
