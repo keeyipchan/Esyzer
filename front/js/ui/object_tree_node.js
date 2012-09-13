@@ -16,8 +16,17 @@ define(function () {
         render: function () {
             var title = this.model.get('name');
             var isClass =this.model.get('isClass');
+            var refs = this.model.get('refs');
+
+            if (refs && refs.length) {
+               title += ' -> ';
+               refs.forEach(function(r){title+='['+r+']'})
+            }
 
             this.$title.text(title);
+
+            console.log(this.model.get('refs'));
+
 
             if (isClass === true) $('<div></div>').addClass('classIcon').prependTo(this.$title);
             if (this.options.meta) $('<div></div>').addClass('metaIcon').prependTo(this.$title);

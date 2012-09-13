@@ -72,6 +72,11 @@ JSObject.prototype = {
         return this;
     },
 
+    getPath: function () {
+        var path = this.parent ? this.parent.getPath()+'.' : '';
+        return path + this.name;
+    },
+
     toJSON: function() {
         var res = {
             name: this.name,
@@ -86,6 +91,9 @@ JSObject.prototype = {
 
         if (this.isInstance) res.isInstance = true;
         if (this.internal) res.internal = true;
+        if (this.refs.length) res.refs = this.refs.map(function (ref) {
+            return ref.getPath()
+        });
 
         return res;
     }
