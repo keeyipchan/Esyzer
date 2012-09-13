@@ -6,7 +6,7 @@ define(function () {
         className: 'objectTreeNode',
         initialize: function () {
             this.$childs = undefined;
-            console.log('init', this.model.attributes.name);
+            console.log('init', this.model.attributes.name, this);
 //            this.model.on('change', this.render, this);
 //            this.model.on('reset', this.render, this);
             this.model.on('all', function () {console.log('All- ' + this.attributes.name + ': ', arguments)});
@@ -16,12 +16,20 @@ define(function () {
             var title = this.model.get('name');
             if (this.model.get('isClass') === true) this.$el.addClass('classNode');
             this.$el.append($('<div></div>').text(title));
+            var childs = [];
             if (this.model.get('fields').length) {
-                this.$childs = $('<ul></ul>').appendTo(this.$el);
                 this.model.get('fields').forEach(function (m) {
                     var node = new ObjectTreeNode({model: m});
-                    this.$childs.append(node.$el);
+                    childs.push(node);
                 }.bind(this));
+            }
+            if (this.model.get('instance')) {
+                childs.push(new ObjectTreeNode({model: this.model.get('instance')}));
+            };
+
+            if (childs.length) {
+                this.$childs = $('<ul></ul>').appendTo(this.$el);
+                childs.forEach(function (c){this.$childs.append(c.$el);}.bind(this))
             }
         }
     });

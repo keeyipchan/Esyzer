@@ -22,12 +22,15 @@
 }
 
 .objectTreeNode {
-  display: inline-block;
-  text-align: center;
+//  display: inline-block;
+//  text-align: center;
   vertical-align: top;
   position: relative;
-  padding: 20px 10px 0 10px;
+  padding: 5px 10px 0 30px;
 
+  &:hover > div {
+    background: #eef;
+  }
   &.classNode > div {
     padding-left: 30px;
     &::before {
@@ -48,6 +51,7 @@
     position: relative;
   }
 
+/*
   &::before, &::after {
     content: '';
     position: absolute;
@@ -77,12 +81,17 @@
   &:last-child:before {
     border-right: 1px solid #ccc;
   }
+*/
 
   ul {
     white-space: nowrap;
-    margin-top: 20px;
     position: relative;
+    border-left: 1px solid #eee;
+    &:hover {
+      border-left-color: #bbb;
+    }
 
+/*
     &:before {
       content: '';
       position: absolute;
@@ -92,5 +101,6 @@
       width: 0;
       height: 20px;
     }
+*/
   }
 }

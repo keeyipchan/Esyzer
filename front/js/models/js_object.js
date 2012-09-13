@@ -18,6 +18,10 @@ define(['./js_objects'], function (JSObjects){
             key: 'fields',
             relatedModel: 'JSObject',
             collectionType: JSObjects
+        }, {
+            type: Backbone.HasOne,
+            key: 'instance',
+            relatedModel: 'JSObject'
         }],
         defaults: function () {
             return {

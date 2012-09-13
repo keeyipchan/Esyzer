@@ -61,13 +61,19 @@ JSObject.prototype = {
         return this.fields[name];
     },
     toJSON: function() {
-        return {
+        var res = {
             name: this.name,
             fields: _.map(this.fields, function (val) {
                 return val.toJSON();
-            }),
-            isClass: this.isClass
+            })
+        };
+        if (this.isClass) {
+            res.isClass = true;
+            res.instance = this.instance.toJSON();
         }
+
+        if (this.isInstance) res.isInstance = true;
+        return res;
     }
 
 };
