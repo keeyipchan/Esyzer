@@ -29,7 +29,7 @@ exports.scope_creation = {
         test.done();
     },
     declareVarInScope:function (test) {
-        ast = parse('var a;');
+        ast = parse('var a;var a;');
         analyzer.analyze(ast);
         test.ok(ast.scope.names !== undefined, 'Identifiers must be in in scope');
         test.ok('a' in ast.scope.names, 'Create identifier in scope');
@@ -176,7 +176,7 @@ exports.linking = {
         ast = parse('var a,b;' +
             'a=b;');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking a=b');
+        test.ok(ast.scope.names['a'].refs[0] === ast.scope.names['b'], 'Trivial linking a=b');
 
         test.done();
     },
@@ -184,7 +184,7 @@ exports.linking = {
         ast = parse('var b;' +
             'var a=b;');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].ref === ast.scope.names['b'], 'Trivial linking var a=b');
+        test.ok(ast.scope.names['a'].refs[0] === ast.scope.names['b'], 'Trivial linking var a=b');
 
         test.done();
     },
@@ -194,7 +194,7 @@ exports.linking = {
             'var a=b;' +
             '}');
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['b'], 'Identifiers must be in in scope');
+        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['b'], 'Identifiers must be in in scope');
 
         test.done();
     },
@@ -207,8 +207,8 @@ exports.linking = {
             '}'
         );
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].ref === ast.scope.names['B'], 'name linking to class on "new"');
-        test.ok(ast.scope.names['B'].instance.fields.x.ref === ast.scope.names['ttt'], 'property linking to class');
+        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'], 'name linking to class on "new"');
+        test.ok(ast.scope.names['B'].instance.fields.x.refs[0] === ast.scope.names['ttt'], 'property linking to class');
 
         test.done();
     }
@@ -223,7 +223,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].fields.x.ref === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names['B'].fields.x.refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     },
     ignoreProtoPrototypeProperty: function(test) {
@@ -232,7 +232,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].fields.x.ref === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names['B'].fields.x.refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     }
 };

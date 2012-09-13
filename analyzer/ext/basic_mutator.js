@@ -45,6 +45,10 @@ BasicMutator.prototype = {
                 obj.markAsClass();
                 break;
 
+            case 'MemberExpression':
+                this.analyzer.getObjectRef(node);
+                break;
+
             case 'Property':
                 // x in { x:1 }
                 obj = node.parent.obj;

@@ -23,11 +23,9 @@ BasicLinker.prototype = {
             case 'AssignmentExpression':
                 var left = this.analyzer.getObjectRef(node.left);
                 if (!left) break;
-                if (left.ref)
-                    throw new Error('Multiple referencing');
                 var right = this.analyzer.getObjectRef(node.right);
                 if (right) {
-                    left.ref = right;
+                    left.addRef(right);
                 }
                 break;
         }

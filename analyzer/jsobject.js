@@ -17,6 +17,7 @@ function JSObject(name, parent) {
     this.name = name;
     this.parent = parent;
     this.fields = {};
+    this.refs = [];//references to other objects  (typically a=b)
 }
 
 JSObject.prototype = {
@@ -54,15 +55,23 @@ JSObject.prototype = {
 //    },
 
     addField: function (name) {
-        if (this.fields[name]) return this.fields[name];
+        if (this.fields.hasOwnProperty(name)) return this.fields[name];
         this.fields[name] = new JSObject(name, this);
         return this.fields[name];
     },
 
     getChild: function (name) {
+        if (!this.fields.hasOwnProperty(name)) return null;
         //todo: implement 'deep' search (name = a.b.c)
         return this.fields[name];
     },
+
+    addRef: function (to) {
+        if (this.refs.indexOf(to)!==-1) return this;
+        this.refs.push(to);
+        return this;
+    },
+
     toJSON: function() {
         var res = {
             name: this.name,

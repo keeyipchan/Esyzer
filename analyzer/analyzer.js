@@ -84,8 +84,7 @@ Analyzer.prototype = {
 //                return obj.instance.getChild(node.property.name);
             } else if (node.object.type === 'ThisExpression' && node.property.type == 'Identifier') {
                 //this.x inside constructor
-                obj = this.getObjectRef(node.object);
-                return obj.instance.addField(node.property.name);
+                if (obj = this.getObjectRef(node.object)) return obj.instance.addField(node.property.name);
 //                return obj.instance.getChild(node.property.name);
             } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype') {
                 //something.x

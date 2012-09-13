@@ -26,7 +26,9 @@ Scope.prototype = {
     /** explicitly adds a new variable to scope */
     addVar:function (name) {
         if (this.names[name])
-            throw 'name ' + name + ' already defined';
+            return this.names[name];
+        //todo: there can be overriding of local names (vars, arguments functions) - think about it
+//            throw Error('name ' + name + ' already defined');
         this.names[name] = new JSObject(name);
         return this.names[name];
     },
