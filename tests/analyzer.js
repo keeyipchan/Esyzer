@@ -148,7 +148,7 @@ exports.class_analysis = {
         test.done();
     },
 
-    trivialProperty:function (test){
+    trivialProperty:function (test) {
         ast = parse('\
             var c=function(){this.x=1};\
             c.prototype.t = function (){this.y=2;}\
@@ -159,7 +159,7 @@ exports.class_analysis = {
         test.done();
     },
 
-    classPrediction: function (test) {
+    classPrediction:function (test) {
         ast = parse('\
             var a = new c;\
             var c=function(){};\
@@ -199,12 +199,12 @@ exports.linking = {
         test.done();
     },
 
-    linkToClass: function (test) {
+    linkToClass:function (test) {
         ast = parse(
             'var B = function () {this.x= new ttt;};' +
-            'function ttt() {' +
-            'var a=new B;' +
-            '}'
+                'function ttt() {' +
+                'var a=new B;' +
+                '}'
         );
         analyzer.analyze(ast);
         test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'], 'name linking to class on "new"');
@@ -217,7 +217,7 @@ exports.linking = {
 
 
 exports.strange_things = {
-    ignoreProtoProperty: function(test) {
+    ignoreProtoProperty:function (test) {
         ast = parse(
             'B.__proto__ = a;' +
                 'B.x=null;'
@@ -226,7 +226,7 @@ exports.strange_things = {
         test.ok(ast.scope.names['B'].fields.x.refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     },
-    ignoreProtoPrototypeProperty: function(test) {
+    ignoreProtoPrototypeProperty:function (test) {
         ast = parse(
             'B.prototype.__proto__ = a;' +
                 'B.x=null;'
@@ -238,26 +238,31 @@ exports.strange_things = {
 };
 
 exports.object_reference = {
-    getRefToLiteralProperty: function(test) {
+    getRefToLiteralProperty:function (test) {
         ast = parse(
             'var a = {};\
             a[0]=1;\
             a["asd"]=3;\
-            a[0].x=3;'
+            a[d].x=3;'
         );
         analyzer.analyze(ast);
         test.ok(ast.scope.names['a'].fields[0] !== undefined, 'create numeric literal property');
         test.ok(ast.scope.names['a'].fields.asd !== undefined, 'create string literal property');
+        test.ok(ast.scope.names['a'].fields.d === undefined, 'dont create property on computed property access');
         test.done();
     },
-    markInternals: function(test) {
+    markInternals:function (test) {
         ast = parse(
             'var a = new x;\
-            c.d = function () {};'
+            c.d = function () {};\
+            c.d.prototype ={\
+             method: function () {}\
+            }'
         );
         analyzer.analyze(ast);
         test.ok(ast.scope.names['a'].internal, 'mark internal from var');
         test.ok(ast.scope.names['c'].fields['d'].internal, 'mark internal from function expression');
+        test.ok(ast.scope.names['c'].fields['d'].instance.fields['method'].internal, 'mark internal from method object literal prototype');
         test.done();
     }
 };

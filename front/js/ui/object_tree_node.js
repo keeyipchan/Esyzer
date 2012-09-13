@@ -17,11 +17,11 @@ define(function () {
             var title = this.model.get('name');
             var isClass =this.model.get('isClass');
 
-            if (!this.model.get('internal')) title = '(e) '+title;
             this.$title.text(title);
 
             if (isClass === true) $('<div></div>').addClass('classIcon').prependTo(this.$title);
             if (this.options.meta) $('<div></div>').addClass('metaIcon').prependTo(this.$title);
+            if (!this.model.get('internal')) $('<div></div>').addClass('externalIcon').prependTo(this.$title);
             var childs = [];
             if (this.model.get('fields').length) {
                 this.model.get('fields').forEach(function (m) {

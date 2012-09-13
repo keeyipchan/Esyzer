@@ -31,7 +31,7 @@
     background: #f2f2f2;
   }
 
-  .classIcon, .metaIcon {
+  .classIcon, .metaIcon, .externalIcon {
     display: inline-block;
     vertical-align: text-top;
     margin-right: 5px;
@@ -43,6 +43,10 @@
 
   .metaIcon {
     .icon("../img/meta_icon.png");
+  }
+
+  .externalIcon {
+    .icon("../img/external_icon.png");
   }
 
   & > div {
@@ -89,7 +93,7 @@
     white-space: nowrap;
     position: relative;
     border-left: 1px solid #eee;
-    margin-left:10px;
+    margin-left: 10px;
     &:hover {
       border-left-color: #bbb;
     }

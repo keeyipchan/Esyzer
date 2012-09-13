@@ -10,7 +10,7 @@ exports.test_real_file = function (test) {
             var module = new Module;
             module.setSrc(data);
             module.analyze();
-
+            test.done();
         }
     })
 }

@@ -24,8 +24,10 @@ BasicMutator.prototype = {
         switch (node.type) {
 
             case 'AssignmentExpression':
+                //something = something
                 left = this.analyzer.getObjectRef(node.left);
                 if (!left) break;
+                left.markInternal();
                 if (node.right.type == 'ObjectExpression') {
                     //x={};
                     if (left.isInstance) {
@@ -35,7 +37,6 @@ BasicMutator.prototype = {
                 } else if (node.right.type == 'FunctionExpression') {
                     //vx=function () {};
                     left.markAsFunction(node.right);
-                    left.markInternal();
                 }
                 break;
 
@@ -58,6 +59,7 @@ BasicMutator.prototype = {
                         node.key.type == 'Literal' ? node.key.value : null;
                     if (name === null) throw 'unknown property key type:'+node.key.type;
                     var field = obj.addField(name);
+                    field.markInternal();
                     //regular data property
                     if (node.value.type == 'FunctionExpression') {
                         // {x: function () {}
