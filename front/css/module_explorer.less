@@ -21,31 +21,33 @@
   white-space: nowrap;
 }
 
-.objectTreeNode {
-//  display: inline-block;
+.objectTreeNode { //  display: inline-block;
 //  text-align: center;
   vertical-align: top;
   position: relative;
-  padding: 5px 10px 0 30px;
+  padding: 5px 10px 0 20px;
 
   &:hover > div {
-    background: #eef;
+    background: #f2f2f2;
   }
-  &.classNode > div {
-    padding-left: 30px;
-    &::before {
-      .icon("../img/class_icon.png");
-      display: block;
-      content: '';
-      position: absolute;
-      left: 5px;
-      top: 3px;
-    }
+
+  .classIcon, .metaIcon {
+    display: inline-block;
+    vertical-align: text-top;
+    margin-right: 5px;
+  }
+
+  .classIcon {
+    .icon("../img/class_icon.png");
+  }
+
+  .metaIcon {
+    .icon("../img/meta_icon.png");
   }
 
   & > div {
     display: inline-block;
-    padding: 5px 10px;
+    padding: 5px;
     border: 1px solid #aac;
     border-radius: 3px;
     position: relative;
@@ -87,20 +89,21 @@
     white-space: nowrap;
     position: relative;
     border-left: 1px solid #eee;
+    margin-left:10px;
     &:hover {
       border-left-color: #bbb;
     }
 
-/*
-    &:before {
-      content: '';
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      border-left: 1px solid #ccc;
-      width: 0;
-      height: 20px;
-    }
-*/
+  /*
+      &:before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        border-left: 1px solid #ccc;
+        width: 0;
+        height: 20px;
+      }
+  */
   }
 }
