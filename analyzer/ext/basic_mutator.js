@@ -35,6 +35,7 @@ BasicMutator.prototype = {
                 } else if (node.right.type == 'FunctionExpression') {
                     //vx=function () {};
                     left.markAsFunction(node.right);
+                    left.markInternal();
                 }
                 break;
 

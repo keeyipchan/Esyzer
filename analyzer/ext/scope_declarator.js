@@ -33,7 +33,7 @@ ScopeDeclarator.prototype = {
         delete node.declarations;
         delete node.kind;
         for (i=0;i<declarations.length;i++) {
-            var v = this.analyzer.getScope(node).addVar(declarations[i].id.name);
+            var v = this.analyzer.getScope(node).addVar(declarations[i].id.name).markInternal();
             if (declarations[i].init) {
 //                if (v.ref) throw 'Multiple referencing';
                 assignments.push({

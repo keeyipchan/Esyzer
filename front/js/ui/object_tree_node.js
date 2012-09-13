@@ -17,6 +17,7 @@ define(function () {
             var title = this.model.get('name');
             var isClass =this.model.get('isClass');
 
+            if (!this.model.get('internal')) title = '(e) '+title;
             this.$title.text(title);
 
             if (isClass === true) $('<div></div>').addClass('classIcon').prependTo(this.$title);

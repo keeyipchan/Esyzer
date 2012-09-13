@@ -249,6 +249,15 @@ exports.object_reference = {
         test.ok(ast.scope.names['a'].fields[0] !== undefined, 'create numeric literal property');
         test.ok(ast.scope.names['a'].fields.asd !== undefined, 'create string literal property');
         test.done();
+    },
+    markInternals: function(test) {
+        ast = parse(
+            'var a = new x;\
+            c.d = function () {};'
+        );
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].internal, 'mark internal from var');
+        test.ok(ast.scope.names['c'].fields['d'].internal, 'mark internal from function expression');
+        test.done();
     }
-
-}
+};

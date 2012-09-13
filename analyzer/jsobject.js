@@ -42,7 +42,10 @@ JSObject.prototype = {
         node && (node.obj = this);
         return this;
     },
-
+    markInternal: function () {
+        this.internal = true;
+        return this;
+    },
 //    markAsReference:function (ref) {
 //        if (this.ref) {
 //            throw Error('Trying to change reference.');
@@ -73,6 +76,8 @@ JSObject.prototype = {
         }
 
         if (this.isInstance) res.isInstance = true;
+        if (this.internal) res.internal = true;
+
         return res;
     }
 
