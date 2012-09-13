@@ -236,3 +236,19 @@ exports.strange_things = {
         test.done();
     }
 };
+
+exports.object_reference = {
+    getRefToLiteralProperty: function(test) {
+        ast = parse(
+            'var a = {};\
+            a[0]=1;\
+            a["asd"]=3;\
+            a[0].x=3;'
+        );
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['a'].fields[0] !== undefined, 'create numeric literal property');
+        test.ok(ast.scope.names['a'].fields.asd !== undefined, 'create string literal property');
+        test.done();
+    }
+
+}

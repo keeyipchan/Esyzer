@@ -10,6 +10,9 @@ var BasicLinker = require('./ext/basic_linker').BasicLinker;
 
 //--------------------------------------
 
+/**
+ * @constructor
+ */
 var Analyzer = function () {
     this.context = {
     };
@@ -86,8 +89,9 @@ Analyzer.prototype = {
 //                return obj.instance.getChild(node.property.name);
             } else if (node.property.type == 'Identifier' && node.property.name !== 'prototype') {
                 //something.x
-                obj = this.getObjectRef(node.object);
-                return obj.addField(node.property.name);
+                if (obj = this.getObjectRef(node.object)) return obj.addField(node.property.name);
+            } else if (node.property.type == 'Literal') {
+                if (obj = this.getObjectRef(node.object)) return obj.addField(node.property.value);
             }
 
         }
