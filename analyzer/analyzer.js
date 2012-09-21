@@ -53,7 +53,7 @@ Analyzer.prototype = {
             return this.getScope(node).getObject(node.name)
         }
         if (node.type == 'NewExpression') {
-            return this.getObjectRef(node.callee);
+            return this.getObjectRef(node.callee).instance;
         }
 
         if (node.type == 'ThisExpression') {

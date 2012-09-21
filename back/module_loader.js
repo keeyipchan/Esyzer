@@ -2,7 +2,7 @@
 var fs = require('fs');
 var config = require('../config.js');
 var q = require('q');
-var Module = require('../analyzer/module.js').Module;
+var Module = require('../analyzer/simple_module.js').SimpleModule;
 
 var modules = {};
 
@@ -13,6 +13,7 @@ function loadModuleList() {
             console.log('Error reading module files: ', err);
             loadDefer.reject(err);
         } else {
+            files.sort();
             for (var i = 0; i < files.length; i++) {
                 var id = files[i];
                 id.match(/\.js$/) && (modules[id] = new Module(id));

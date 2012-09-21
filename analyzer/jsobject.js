@@ -102,6 +102,12 @@ JSObject.prototype = {
         });
 
         return res;
+    },
+    merge: function (obj) {
+        for (var s in obj.fields) {
+            if (this.fields[s]) throw 'merge same field';
+            this.fields[s] = obj.fields[s];
+        }
     }
 
 };

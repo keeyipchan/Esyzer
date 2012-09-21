@@ -1,6 +1,7 @@
 'use strict';
 var parse = require('esprima').parse;
 var analyzer = require('../analyzer/analyzer').analyzer;
+var JSObject = require('../analyzer/jsobject.js').JSObject;
 
 var ast, src;
 
@@ -208,8 +209,8 @@ exports.linking = {
                 '}'
         );
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'], 'name linking to class on "new"');
-        test.ok(ast.scope.names['B'].instance.fields.x.refs[0] === ast.scope.names['ttt'], 'property linking to class');
+        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'].instance, 'name linking to class on "new"');
+        test.ok(ast.scope.names['B'].instance.fields.x.refs[0] === ast.scope.names['ttt'].instance, 'property linking to class instance');
 
         test.done();
     }
@@ -265,21 +266,24 @@ exports.object_reference = {
         test.ok(ast.scope.names['c'].fields['d'].internal, 'mark internal from function expression');
         test.ok(ast.scope.names['c'].fields['d'].instance.fields['method'].internal, 'mark internal from method object literal prototype');
         test.done();
-    },
-    resolveLocalRefs: function (test) {
-        ast = parse(
-            'var x = function () {};\
-            var a = new x;\
-            a.d = 123;\
-            x.prototype.d = function (a){\
-            this.s = a;\
-            }\
-            '
-        );
-
-        analyzer.analyze(ast);
-        test.ok(ast.scope.names['x'].instance.fields.d !== undefined);
-        test.done();
-
     }
 };
+
+
+exports.object_js = {
+    mergeToObject:function (test) {
+        var a = new JSObject();
+        a.markAsClass();
+        var b = new JSObject();
+        b.markAsClass();
+
+        a.addField('asd');
+        a.instance.addField('f');
+        b.merge(a);
+
+        test.ok(b.fields['asd'] !== undefined, 'merge field');
+        test.ok(b.instance.fields['f'] !== undefined, 'merge field from instance');
+        test.done();
+    }
+};
+
