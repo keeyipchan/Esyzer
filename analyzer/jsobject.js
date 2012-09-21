@@ -26,13 +26,18 @@ JSObject.prototype = {
         this.isClass = true;
 
         /** container for properties of 'instance' */
-        this.instance = new JSObject('<instance of '+this.name+'>', this);
+        this.instance = new JSObject('<instance of ' + this.name + '>', this);
         this.instance.markAsInstance();
         return this;
     },
 
-    markAsInstance: function () {
+    markAsInstance:function () {
         this.isInstance = true;
+        return this;
+    },
+
+    markAsArgument:function () {
+        this.isArgument = true;
         return this;
     },
 
@@ -43,7 +48,7 @@ JSObject.prototype = {
         node && (node.obj = this);
         return this;
     },
-    markInternal: function () {
+    markInternal:function () {
         this.internal = true;
         return this;
     },
@@ -54,33 +59,34 @@ JSObject.prototype = {
 //        this.ref = ref;
 //    },
 
-    addField: function (name) {
+    addField:function (name) {
         if (this.fields.hasOwnProperty(name)) return this.fields[name];
         this.fields[name] = new JSObject(name, this);
         return this.fields[name];
     },
 
-    getChild: function (name) {
+    getChild:function (name) {
         if (!this.fields.hasOwnProperty(name)) return null;
         //todo: implement 'deep' search (name = a.b.c)
         return this.fields[name];
     },
 
-    addRef: function (to) {
-        if (this.refs.indexOf(to)!==-1) return this;
+    addRef:function (to) {
+        if (this.refs.indexOf(to) !== -1) return this;
         this.refs.push(to);
         return this;
     },
 
-    getPath: function () {
-        var path = this.parent ? this.parent.getPath()+'.' : '';
-        return path + this.name;
+    getPath:function () {
+        var path = this.parent ? this.parent.getPath() + '.' : '';
+        var name = this.isArgument ? 'arg:' : '';
+        return path + name + this.name;
     },
 
-    toJSON: function() {
+    toJSON:function () {
         var res = {
-            name: this.name,
-            fields: _.map(this.fields, function (val) {
+            name:this.name,
+            fields:_.map(this.fields, function (val) {
                 return val.toJSON();
             })
         };

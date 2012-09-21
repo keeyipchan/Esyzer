@@ -48,6 +48,7 @@ exports.scope_creation = {
         analyzer.analyze(ast);
         test.ok('a' in ast.body[1].scope.names, 'Create function argument in scope');
         test.ok('b' in ast.body[1].scope.names, 'Create function argument in scope');
+        test.ok(ast.body[1].scope.names.a.isArgument, 'Mark function argument');
         test.done();
     }
 
@@ -264,5 +265,21 @@ exports.object_reference = {
         test.ok(ast.scope.names['c'].fields['d'].internal, 'mark internal from function expression');
         test.ok(ast.scope.names['c'].fields['d'].instance.fields['method'].internal, 'mark internal from method object literal prototype');
         test.done();
+    },
+    resolveLocalRefs: function (test) {
+        ast = parse(
+            'var x = function () {};\
+            var a = new x;\
+            a.d = 123;\
+            x.prototype.d = function (a){\
+            this.s = a;\
+            }\
+            '
+        );
+
+        analyzer.analyze(ast);
+        test.ok(ast.scope.names['x'].instance.fields.d !== undefined);
+        test.done();
+
     }
 };

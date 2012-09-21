@@ -35,21 +35,13 @@ Module.prototype = {
     },
     analyze: function () {
         analyzer.analyze(this.ast);
-//        this.global = this.ast.scope.names;
-//        this.exports = this.global.exports;
+        this.resolveRefs();
         this.analyzed = true;
-//        this.classList = [];
-
-//        var stack = [this.ast.scope];
-//        while (stack.length) {
-//            var scope = stack.pop();
-//            for (var n in scope.names) {
-//                scope.names[n].isClass && this.classList.push(scope.names[n].toJSON())
-//            }
-//            stack.concat(scope.inner);
-//        }
 
         return this;
+    },
+    resolveRefs: function (){
+
     }
 };
 

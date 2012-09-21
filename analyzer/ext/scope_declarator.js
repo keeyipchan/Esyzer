@@ -66,7 +66,7 @@ ScopeDeclarator.prototype = {
 //                this.scopeChain.push(node.scope);
 
                 for (var i = 0; i < node.params.length; i++)
-                    node.scope.addVar(node.params[i].name)
+                    node.scope.addVar(node.params[i].name).markAsArgument();
                 break;
 
             case 'VariableDeclaration':
