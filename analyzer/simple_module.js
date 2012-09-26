@@ -19,8 +19,10 @@ var SimpleModule = function (id) {
 
 SimpleModule.prototype = {
     toJSON:function () {
+        if (this.cached && this.analyzed) return this.cached;
         return {
             id:this.id,
+            analyzed:true,
             names:this.ast.scope.toJSON()
         }
     },

@@ -26,6 +26,9 @@ function loadModuleList() {
 
 function loadModule(id) {
     var loadDefer = q.defer();
+    if (!fs.existsSync(config.cachePath)) {
+        fs.mkdirSync(config.cachePath);
+    }
     if (!modules[id]) {
         if (!fs.existsSync(config.srcPath + '/' + id)) {
             //not in list
@@ -36,16 +39,33 @@ function loadModule(id) {
     }
 
     if (modules[id] && !modules[id].analyzed) {
-        fs.readFile(config.srcPath + '/' + id, 'utf8', function (err, data) {
-            if (err) {
-                console.log('Error reading module file: ', err);
-                loadDefer.reject(err);
-            } else {
-                modules[id].setSrc(data);
-                modules[id].analyze();
-                loadDefer.resolve();
-            }
-        })
+
+        if (fs.existsSync(config.cachePath + '/' + id)) {
+            fs.readFile(config.cachePath + '/' + id, 'utf8', function (err, data) {
+                if (err) {
+                    console.log('Error reading cached module file: ', err);
+                    loadDefer.reject(err);
+                } else {
+                    modules[id].cached = data;
+                    modules[id].analyzed = true;
+                    loadDefer.resolve();
+                }
+            })
+        } else {
+            fs.readFile(config.srcPath + '/' + id, 'utf8', function (err, data) {
+                if (err) {
+                    console.log('Error reading module file: ', err);
+                    loadDefer.reject(err);
+                } else {
+                    console.log(id);
+                    modules[id].setSrc(data);
+                    modules[id].analyze();
+                    modules[id].cached = JSON.stringify(modules[id].toJSON());
+                    fs.writeFileSync(config.cachePath + '/' + id, modules[id].cached);
+                    loadDefer.resolve();
+                }
+            })
+        }
     } else {
         //already loaded
         loadDefer.resolve();
@@ -68,13 +88,13 @@ exports.getModules = function (req, res) {
 exports.getModule = function (req, res) {
     loadModule(req.params.id).then(function () {
         try {
-        var obj =modules[req.params.id];
-        res.send(obj.toJSON());
-        }catch (e) {
-            console.log('Error in getModule:', e.message);
+            var obj = modules[req.params.id];
+            res.send(obj.toJSON());
+        } catch (e) {
+            console.log('Error in getModule:',req.params.id, e.message, e.stack);
         }
     }).fail(function (err) {
-        res.send(err);
-    })
+            res.send(err);
+        })
 };
 

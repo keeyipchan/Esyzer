@@ -7,10 +7,10 @@ define(function () {
         initialize: function () {
             this.$childs = undefined;
             this.$title = $('<div></div>').appendTo(this.$el);
-            console.log('init', this.model.attributes.name, this);
+//            console.log('init', this.model.attributes.name, this);
 //            this.model.on('change', this.render, this);
 //            this.model.on('reset', this.render, this);
-            this.model.on('all', function () {console.log('All- ' + this.attributes.name + ': ', arguments)});
+//            this.model.on('all', function () {console.log('All- ' + this.attributes.name + ': ', arguments)});
             this.render();
         },
         render: function () {
@@ -25,7 +25,7 @@ define(function () {
 
             this.$title.text(title);
 
-            console.log(this.model.get('refs'));
+//            console.log(this.model.get('refs'));
 
 
             if (isClass === true) $('<div></div>').addClass('classIcon').prependTo(this.$title);

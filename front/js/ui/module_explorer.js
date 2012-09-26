@@ -28,7 +28,7 @@ define(['./object_tree_node'], function (ObjectTreeNode) {
             module.fetch();
         },
         _onModuleNameAdd: function (m) {
-            console.log('add:', arguments);
+//            console.log('add:', arguments);
             var node = new ObjectTreeNode({model: m});
             this.$list.append(node.$el);
         },

@@ -15,10 +15,10 @@ define(function () {
         },
         loadObjectTree:function () {
             this.getJSON('ObjectTree.json').success(function (data) {
-                console.log(data);
+//                console.log(data);
                 this.trigger('objectTreeLoaded', data);
             }.bind(this)).error(function () {
-                    console.log('error loading object tree')
+                    console.error('error loading object tree')
                 });
         }
     };
