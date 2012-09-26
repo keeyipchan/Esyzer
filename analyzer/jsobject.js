@@ -105,8 +105,13 @@ JSObject.prototype = {
     },
     merge: function (obj) {
         for (var s in obj.fields) {
-            if (this.fields[s]) throw 'merge same field';
-            this.fields[s] = obj.fields[s];
+            if (!this.fields[s]) {
+                this.fields[s] = new JSObject(s, this);
+            }
+            this.fields[s].merge(obj.fields[s])
+        }
+        if (this.isClass && obj.isClass) {
+            this.instance.merge(obj.instance);
         }
     }
 

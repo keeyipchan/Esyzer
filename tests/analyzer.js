@@ -277,6 +277,8 @@ exports.object_js = {
         var b = new JSObject();
         b.markAsClass();
 
+        b.addField('common');
+        a.addField('common');
         a.addField('asd');
         a.instance.addField('f');
         b.merge(a);
@@ -285,5 +287,6 @@ exports.object_js = {
         test.ok(b.instance.fields['f'] !== undefined, 'merge field from instance');
         test.done();
     }
+
 };
 
