@@ -122,9 +122,9 @@ exports.class_analysis = {
             c.prototype.t = function (){}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].instance.fields.t.node == ast.body[1].expression.right, 'set correct node');
+        test.ok(ast.scope.names['c'].instance.getField('t') !== null, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.getField('t').isFunction, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.getField('t').node == ast.body[1].expression.right, 'set correct node');
         test.done();
     },
 
@@ -140,12 +140,12 @@ exports.class_analysis = {
         analyzer.analyze(ast);
         test.ok(ast.scope.names['c'].isClass, 'mark as a class on prototype literal');
         test.ok(ast.body[1].expression.right.obj == ast.scope.names['c'].instance, 'must link object node to instance in class');
-        test.ok(ast.scope.names['c'].instance.fields.t !== undefined, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.fields.t.isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].instance.fields.t.node.id.name == 'aa', 'set correct node');
+        test.ok(ast.scope.names['c'].instance.getField('t') !== null, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.getField('t').isFunction, 'mark field as function');
+        test.ok(ast.scope.names['c'].instance.getField('t').node.id.name == 'aa', 'set correct node');
 
-        test.ok(ast.scope.names['c'].instance.fields.x !== undefined, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.fields['d d'] !== undefined, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.getField('x') !== null, 'create field in class');
+        test.ok(ast.scope.names['c'].instance.getField('d d') !== null, 'create field in class');
 
         test.done();
     },
@@ -156,8 +156,8 @@ exports.class_analysis = {
             c.prototype.t = function (){this.y=2;}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].instance.fields.x !== undefined, 'create property on \'this.x\' in constructor');
-        test.ok(ast.scope.names['c'].instance.fields.y !== undefined, 'create property on \'this.x\' in method');
+        test.ok(ast.scope.names['c'].instance.getField('x') !== null, 'create property on \'this.x\' in constructor');
+        test.ok(ast.scope.names['c'].instance.getField('y') !== null, 'create property on \'this.x\' in method');
         test.done();
     },
 
@@ -210,7 +210,7 @@ exports.linking = {
         );
         analyzer.analyze(ast);
         test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'].instance, 'name linking to class on "new"');
-        test.ok(ast.scope.names['B'].instance.fields.x.refs[0] === ast.scope.names['ttt'].instance, 'property linking to class instance');
+        test.ok(ast.scope.names['B'].instance.getField('x').refs[0] === ast.scope.names['ttt'].instance, 'property linking to class instance');
 
         test.done();
     }
@@ -225,7 +225,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].fields.x.refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names['B'].getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     },
     ignoreProtoPrototypeProperty:function (test) {
@@ -234,7 +234,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].fields.x.refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names['B'].getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     }
 };
@@ -248,9 +248,9 @@ exports.object_reference = {
             a[d].x=3;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].fields[0] !== undefined, 'create numeric literal property');
-        test.ok(ast.scope.names['a'].fields.asd !== undefined, 'create string literal property');
-        test.ok(ast.scope.names['a'].fields.d === undefined, 'dont create property on computed property access');
+        test.ok(ast.scope.names['a'].getField('0') !== null, 'create numeric literal property');
+        test.ok(ast.scope.names['a'].getField('asd') !== null, 'create string literal property');
+        test.ok(ast.scope.names['a'].getField('d') === null, 'dont create property on computed property access');
         test.done();
     },
     markInternals:function (test) {
@@ -263,8 +263,8 @@ exports.object_reference = {
         );
         analyzer.analyze(ast);
         test.ok(ast.scope.names['a'].internal, 'mark internal from var');
-        test.ok(ast.scope.names['c'].fields['d'].internal, 'mark internal from function expression');
-        test.ok(ast.scope.names['c'].fields['d'].instance.fields['method'].internal, 'mark internal from method object literal prototype');
+        test.ok(ast.scope.names['c'].getField('d').internal, 'mark internal from function expression');
+        test.ok(ast.scope.names['c'].getField('d').instance.getField('method').internal, 'mark internal from method object literal prototype');
         test.done();
     }
 };
@@ -283,8 +283,8 @@ exports.object_js = {
         a.instance.addField('f');
         b.merge(a);
 
-        test.ok(b.fields['asd'] !== undefined, 'merge field');
-        test.ok(b.instance.fields['f'] !== undefined, 'merge field from instance');
+        test.ok(b.getField('asd') !== null, 'merge field');
+        test.ok(b.instance.getField('f') !== null, 'merge field from instance');
         test.done();
     }
 

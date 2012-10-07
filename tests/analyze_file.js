@@ -13,5 +13,5 @@ exports.test_real_file = function (test) {
             test.done();
         }
     })
-}
+};
 

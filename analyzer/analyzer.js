@@ -27,7 +27,7 @@ var Analyzer = function () {
 };
 
 Analyzer.prototype = {
-    getScope: function (node) {
+    getScope:function (node) {
         var x = 1;
         while (!node.scope) {
             node = node.parent
@@ -39,21 +39,22 @@ Analyzer.prototype = {
      *  indicates the result of evaluating node is 'prototype' property of object
      * @param node
      */
-    isPrototype: function (node) {
+    isPrototype:function (node) {
         if (node.type !== 'MemberExpression') return false;
         return node.property.type == 'Identifier' && node.property.name == 'prototype' && this.getObjectRef(node.object);
     },
 
 
     /** get the object referenced by node. Try to create objects and properties */
-    getObjectRef: function (node) {
+    getObjectRef:function (node) {
         var obj;
 
         if (node.type == 'Identifier') {
             return this.getScope(node).getObject(node.name)
         }
         if (node.type == 'NewExpression') {
-            return this.getObjectRef(node.callee).instance;
+            obj = this.getObjectRef(node.callee);
+            return obj ? obj.instance : null;
         }
 
         if (node.type == 'ThisExpression') {
@@ -69,7 +70,7 @@ Analyzer.prototype = {
 
         if (node.type == 'MemberExpression') {
             //completelly ignore `__proto__` as a property in member expression
-            if (node.property.name == '__proto__') return null;
+            if (isNativeProperty(node.property.name)) return null;
             if (this.isPrototype(node)) {
                 //x.prototype
                 obj = this.getObjectRef(node.object);
@@ -98,12 +99,23 @@ Analyzer.prototype = {
         return null;
     },
 
-    analyze: function (ast) {
+    analyze:function (ast) {
         for (var i = 0; i < this.passes.length; i++) {
             this.passes[i].init(ast);
             visitor.traverse(ast, this.passes[i]);
         }
     }
 };
+
+
+/** checking if the given property is language-native object property
+ *  we should skip them becouse of using name of field from source as a key to JS object and this interfere
+ *  we should change the way how we do this to have ability to store any name.
+ * @param name
+ */
+function isNativeProperty(name) {
+    var names = ['__proto__', 'hasOwnProperty'];
+    return names.indexOf(name) >= 0;
+}
 
 exports.analyzer = new Analyzer;

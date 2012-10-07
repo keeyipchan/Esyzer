@@ -16,7 +16,7 @@ var _ = require('underscore');
 function JSObject(name, parent) {
     this.name = name;
     this.parent = parent;
-    this.fields = {};
+    this.fields = [];
     this.refs = [];//references to other objects  (typically a=b)
 }
 
@@ -59,16 +59,20 @@ JSObject.prototype = {
 //        this.ref = ref;
 //    },
 
+
     addField:function (name) {
-        if (this.fields.hasOwnProperty(name)) return this.fields[name];
-        this.fields[name] = new JSObject(name, this);
-        return this.fields[name];
+        var f;
+        if (f = this.getField(name)) return f;
+        f = { name:name, obj:new JSObject(name, this)};
+        this.fields.push(f);
+        return f.obj;
     },
 
-    getChild:function (name) {
-        if (!this.fields.hasOwnProperty(name)) return null;
-        //todo: implement 'deep' search (name = a.b.c)
-        return this.fields[name];
+    getField:function (name) {
+        for (var i = 0; i < this.fields.length; i++) {
+            if (this.fields[i].name == name) return this.fields[i].obj;
+        }
+        return null;
     },
 
     addRef:function (to) {
@@ -87,7 +91,7 @@ JSObject.prototype = {
         var res = {
             name:this.name,
             fields:_.map(this.fields, function (val) {
-                return val.toJSON();
+                return val.obj.toJSON();
             })
         };
         if (this.isClass) {
@@ -103,12 +107,16 @@ JSObject.prototype = {
 
         return res;
     },
-    merge: function (obj) {
+    merge:function (obj) {
         for (var s in obj.fields) {
             if (!this.fields[s]) {
                 this.fields[s] = new JSObject(s, this);
             }
-            this.fields[s].merge(obj.fields[s])
+            try {
+                this.fields[s].merge(obj.fields[s])
+            } catch (e) {
+                console.log(this.fields[s].merge)
+            }
         }
         if (this.isClass && obj.isClass) {
             this.instance.merge(obj.instance);

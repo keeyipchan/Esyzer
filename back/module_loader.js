@@ -4,9 +4,9 @@ var config = require('../config.js');
 var q = require('q');
 var Module = require('../analyzer/simple_module.js').SimpleModule;
 
-var modules = {};
+var modules = exports.modules = {};
 
-function loadModuleList() {
+exports.loadModuleList = function() {
     var loadDefer = q.defer();
     fs.readdir(config.srcPath, function (err, files) {
         if (err) {
@@ -24,7 +24,8 @@ function loadModuleList() {
     return loadDefer.promise;
 }
 
-function loadModule(id) {
+exports.loadModule = function (id) {
+    console.log('loading', id);
     var loadDefer = q.defer();
     if (!fs.existsSync(config.cachePath)) {
         fs.mkdirSync(config.cachePath);
