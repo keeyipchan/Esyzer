@@ -60,10 +60,10 @@ JSObject.prototype = {
 //    },
 
 
-    addField:function (name) {
+    addField:function (name, obj) {
         var f;
         if (f = this.getField(name)) return f;
-        f = { name:name, obj:new JSObject(name, this)};
+        f = { name:name, obj: obj ? obj : new JSObject(name, this)};
         this.fields.push(f);
         return f.obj;
     },
@@ -108,15 +108,12 @@ JSObject.prototype = {
         return res;
     },
     merge:function (obj) {
-        for (var s in obj.fields) {
-            if (!this.fields[s]) {
-                this.fields[s] = new JSObject(s, this);
+        for (var i = 0;i<obj.fields.length;i++) {
+            var s = obj.fields[i].name;
+            if (!this.getField(s)) {
+                this.addField(s, new JSObject(s, this));
             }
-            try {
-                this.fields[s].merge(obj.fields[s])
-            } catch (e) {
-                console.log(this.fields[s].merge)
-            }
+            this.getField(s).merge(obj.getField(s))
         }
         if (this.isClass && obj.isClass) {
             this.instance.merge(obj.instance);
