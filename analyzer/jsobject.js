@@ -16,7 +16,7 @@ var _ = require('underscore');
 function JSObject(name, parent) {
     this.name = name;
     this.parent = parent;
-    this.fields = [];
+    this.fields = new JSObjectList(this);
     this.refs = [];//references to other objects  (typically a=b)
 }
 
@@ -61,18 +61,11 @@ JSObject.prototype = {
 
 
     addField:function (name, obj) {
-        var f;
-        if (f = this.getField(name)) return f;
-        f = { name:name, obj: obj ? obj : new JSObject(name, this)};
-        this.fields.push(f);
-        return f.obj;
+        return this.fields.add(name, obj);
     },
 
     getField:function (name) {
-        for (var i = 0; i < this.fields.length; i++) {
-            if (this.fields[i].name == name) return this.fields[i].obj;
-        }
-        return null;
+        return this.fields.get(name);
     },
 
     addRef:function (to) {
@@ -108,7 +101,7 @@ JSObject.prototype = {
         return res;
     },
     merge:function (obj) {
-        for (var i = 0;i<obj.fields.length;i++) {
+        for (var i = 0; i < obj.fields.length; i++) {
             var s = obj.fields[i].name;
             if (!this.getField(s)) {
                 this.addField(s, new JSObject(s, this));
@@ -123,4 +116,38 @@ JSObject.prototype = {
 };
 
 
+
+
+/*****************************************/
+/**
+ * @param parent parent for added objects
+ * @constructor
+ */
+var JSObjectList = function (parent) {
+    this.length = 0;
+    this.parent = parent;
+};
+
+JSObjectList.prototype = {
+    get: function (name) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i].name == name) return this[i];
+        }
+        return null;
+    },
+    add: function (name, obj) {
+        var f;
+        if (f = this.get(name)) return f;
+        f =  new JSObject(name, this.parent);
+        this.push(f);
+        return f;
+    }
+};
+
+//noinspection JSValidateTypes
+JSObjectList.prototype.__proto__ = Array.prototype;
+
+
 exports.JSObject = JSObject;
+exports.JSObjectList = JSObjectList;
+

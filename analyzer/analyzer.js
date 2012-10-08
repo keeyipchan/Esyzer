@@ -70,7 +70,7 @@ Analyzer.prototype = {
 
         if (node.type == 'MemberExpression') {
             //completelly ignore `__proto__` as a property in member expression
-            if (isNativeProperty(node.property.name)) return null;
+//            if (isNativeProperty(node.property.name)) return null;
             if (this.isPrototype(node)) {
                 //x.prototype
                 obj = this.getObjectRef(node.object);
