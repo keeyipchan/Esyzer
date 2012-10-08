@@ -1,6 +1,7 @@
 'use strict';
 
 var JSObject = require('./jsobject.js').JSObject;
+var JSObjectList = require('./jsobject.js').JSObjectList;
 var _ = require('underscore');
 
 /**
@@ -16,27 +17,22 @@ function Scope(parent, node) {
     this.inner = [];
 
     if (parent) parent.inner.push(this);
-    /** hash of names
-     * each name is an JSObject
-     */
-    this.names = {};
+
+    this.names = new JSObjectList;
 }
 
 Scope.prototype = {
     /** explicitly adds a new variable to scope */
     addVar:function (name) {
-        if (this.names[name])
-            return this.names[name];
+        var n;
+        if (n = this.names.get(name)) return n;
         //todo: there can be overriding of local names (vars, arguments functions) - think about it
 //            throw Error('name ' + name + ' already defined');
-        this.names[name] = new JSObject(name);
-        return this.names[name];
-    },
-    addFunction:function (name) {
-        return this.addVar(name).markAsFunction();
+        return this.names.add(name);
     },
     getObject:function (name) {
-        if (this.names[name]) return this.names[name];
+        var n;
+        if (n = this.names.get(name)) return n;
         if (this.parent) return this.parent.getObject(name);
         return this.addVar(name);
     },

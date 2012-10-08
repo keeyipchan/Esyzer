@@ -104,7 +104,7 @@ JSObject.prototype = {
         for (var i = 0; i < obj.fields.length; i++) {
             var s = obj.fields[i].name;
             if (!this.getField(s)) {
-                this.addField(s, new JSObject(s, this));
+                this.addField(s);
             }
             this.getField(s).merge(obj.getField(s))
         }

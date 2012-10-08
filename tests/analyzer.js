@@ -33,23 +33,23 @@ exports.scope_creation = {
         ast = parse('var a;var a;');
         analyzer.analyze(ast);
         test.ok(ast.scope.names !== undefined, 'Identifiers must be in in scope');
-        test.ok('a' in ast.scope.names, 'Create identifier in scope');
-        test.ok(ast.scope.names['a'].name === 'a', 'Store name as a property');
+        test.ok(ast.scope.names.get('a'), 'Create identifier in scope');
+        test.ok(ast.scope.names.get('a').name === 'a', 'Store name as a property');
         test.done();
     },
     declareFunctionNameInScope:function (test) {
         ast = parse('function asd() {};');
         analyzer.analyze(ast);
-        test.ok('asd' in ast.scope.names);
-        test.ok(ast.scope.names['asd'].name === 'asd', 'Store name as a property');
+        test.ok(ast.scope.names.get('asd'));
+        test.ok(ast.scope.names.get('asd').name === 'asd', 'Store name as a property');
         test.done();
     },
     declareArgumentsInScope:function (test) {
         ast = parse('var a;function asd(a,b) {};');
         analyzer.analyze(ast);
-        test.ok('a' in ast.body[1].scope.names, 'Create function argument in scope');
-        test.ok('b' in ast.body[1].scope.names, 'Create function argument in scope');
-        test.ok(ast.body[1].scope.names.a.isArgument, 'Mark function argument');
+        test.ok(ast.body[1].scope.names.get('a'), 'Create function argument in scope');
+        test.ok(ast.body[1].scope.names.get('a'), 'Create function argument in scope');
+        test.ok(ast.body[1].scope.names.get('a').isArgument, 'Mark function argument');
         test.done();
     }
 
@@ -62,10 +62,10 @@ exports.mutating = {
             c = function (){}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['x'].isFunction, 'Deanonimizing function in variable declaration');
-        test.ok(ast.scope.names['x'].node.type == 'FunctionExpression', 'Node saving in variable declaration');
-        test.ok(ast.scope.names['c'].isFunction, 'Deanonimizing function in assignment expression');
-        test.ok(ast.scope.names['c'].node == ast.body[1].expression.right, 'Node saving in in assignment expression');
+        test.ok(ast.scope.names.get('x').isFunction, 'Deanonimizing function in variable declaration');
+        test.ok(ast.scope.names.get('x').node.type == 'FunctionExpression', 'Node saving in variable declaration');
+        test.ok(ast.scope.names.get('c').isFunction, 'Deanonimizing function in assignment expression');
+        test.ok(ast.scope.names.get('c').node == ast.body[1].expression.right, 'Node saving in in assignment expression');
         test.done();
     },
     assigningObjectToFunctionNode:function (test) {
@@ -74,8 +74,8 @@ exports.mutating = {
             d = function () {};\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].node.obj == ast.scope.names['c'], 'Associating object to function');
-        test.ok(ast.scope.names['d'].node.obj == ast.scope.names['d'], 'Associating object to function');
+        test.ok(ast.scope.names.get('c').node.obj == ast.scope.names.get('c'), 'Associating object to function');
+        test.ok(ast.scope.names.get('d').node.obj == ast.scope.names.get('d'), 'Associating object to function');
         test.done();
 
     }
@@ -88,7 +88,7 @@ exports.class_analysis = {
             o = new c();\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].isClass, 'Create class from trivial new');
+        test.ok(ast.scope.names.get('c').isClass, 'Create class from trivial new');
         test.done();
     },
     convertToClassOnPrototype:function (test) {
@@ -97,7 +97,7 @@ exports.class_analysis = {
             c.prototype.x = function() {}; \
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].isClass, 'Create class from prototype access');
+        test.ok(ast.scope.names.get('c').isClass, 'Create class from prototype access');
         test.done();
     },
 
@@ -111,8 +111,8 @@ exports.class_analysis = {
                 }\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].isClass, 'Make class on \'this\' in constructor in VariableDeclaration');
-        test.ok(ast.scope.names['d'].isClass, 'Make class on \'this\' in constructor in FunctionExpression');
+        test.ok(ast.scope.names.get('c').isClass, 'Make class on \'this\' in constructor in VariableDeclaration');
+        test.ok(ast.scope.names.get('d').isClass, 'Make class on \'this\' in constructor in FunctionExpression');
         test.done();
     },
 
@@ -122,9 +122,9 @@ exports.class_analysis = {
             c.prototype.t = function (){}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].instance.getField('t') !== null, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.getField('t').isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].instance.getField('t').node == ast.body[1].expression.right, 'set correct node');
+        test.ok(ast.scope.names.get('c').instance.getField('t') !== null, 'create field in class');
+        test.ok(ast.scope.names.get('c').instance.getField('t').isFunction, 'mark field as function');
+        test.ok(ast.scope.names.get('c').instance.getField('t').node == ast.body[1].expression.right, 'set correct node');
         test.done();
     },
 
@@ -138,14 +138,14 @@ exports.class_analysis = {
             }\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].isClass, 'mark as a class on prototype literal');
-        test.ok(ast.body[1].expression.right.obj == ast.scope.names['c'].instance, 'must link object node to instance in class');
-        test.ok(ast.scope.names['c'].instance.getField('t') !== null, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.getField('t').isFunction, 'mark field as function');
-        test.ok(ast.scope.names['c'].instance.getField('t').node.id.name == 'aa', 'set correct node');
+        test.ok(ast.scope.names.get('c').isClass, 'mark as a class on prototype literal');
+        test.ok(ast.body[1].expression.right.obj == ast.scope.names.get('c').instance, 'must link object node to instance in class');
+        test.ok(ast.scope.names.get('c').instance.getField('t') !== null, 'create field in class');
+        test.ok(ast.scope.names.get('c').instance.getField('t').isFunction, 'mark field as function');
+        test.ok(ast.scope.names.get('c').instance.getField('t').node.id.name == 'aa', 'set correct node');
 
-        test.ok(ast.scope.names['c'].instance.getField('x') !== null, 'create field in class');
-        test.ok(ast.scope.names['c'].instance.getField('d d') !== null, 'create field in class');
+        test.ok(ast.scope.names.get('c').instance.getField('x') !== null, 'create field in class');
+        test.ok(ast.scope.names.get('c').instance.getField('d d') !== null, 'create field in class');
 
         test.done();
     },
@@ -156,8 +156,8 @@ exports.class_analysis = {
             c.prototype.t = function (){this.y=2;}\
         ');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].instance.getField('x') !== null, 'create property on \'this.x\' in constructor');
-        test.ok(ast.scope.names['c'].instance.getField('y') !== null, 'create property on \'this.x\' in method');
+        test.ok(ast.scope.names.get('c').instance.getField('x') !== null, 'create property on \'this.x\' in constructor');
+        test.ok(ast.scope.names.get('c').instance.getField('y') !== null, 'create property on \'this.x\' in method');
         test.done();
     },
 
@@ -168,7 +168,7 @@ exports.class_analysis = {
         ');
 
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['c'].isClass, 'Create class on guess');
+        test.ok(ast.scope.names.get('c').isClass, 'Create class on guess');
         test.done();
     }
 };
@@ -178,7 +178,7 @@ exports.linking = {
         ast = parse('var a,b;' +
             'a=b;');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].refs[0] === ast.scope.names['b'], 'Trivial linking a=b');
+        test.ok(ast.scope.names.get('a').refs[0] === ast.scope.names.get('b'), 'Trivial linking a=b');
 
         test.done();
     },
@@ -186,7 +186,7 @@ exports.linking = {
         ast = parse('var b;' +
             'var a=b;');
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].refs[0] === ast.scope.names['b'], 'Trivial linking var a=b');
+        test.ok(ast.scope.names.get('a').refs[0] === ast.scope.names.get('b'), 'Trivial linking var a=b');
 
         test.done();
     },
@@ -196,7 +196,7 @@ exports.linking = {
             'var a=b;' +
             '}');
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['b'], 'Identifiers must be in in scope');
+        test.ok(ast.body[1].scope.names.get('a').refs[0] === ast.scope.names.get('b'), 'Identifiers must be in in scope');
 
         test.done();
     },
@@ -209,8 +209,8 @@ exports.linking = {
                 '}'
         );
         analyzer.analyze(ast);
-        test.ok(ast.body[1].scope.names['a'].refs[0] === ast.scope.names['B'].instance, 'name linking to class on "new"');
-        test.ok(ast.scope.names['B'].instance.getField('x').refs[0] === ast.scope.names['ttt'].instance, 'property linking to class instance');
+        test.ok(ast.body[1].scope.names.get('a').refs[0] === ast.scope.names.get('B').instance, 'name linking to class on "new"');
+        test.ok(ast.scope.names.get('B').instance.getField('x').refs[0] === ast.scope.names.get('ttt').instance, 'property linking to class instance');
 
         test.done();
     }
@@ -225,7 +225,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names.get('B').getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     },
     ignoreProtoPrototypeProperty:function (test) {
@@ -234,7 +234,7 @@ exports.strange_things = {
                 'B.x=null;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['B'].getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
+        test.ok(ast.scope.names.get('B').getField('x').refs[0] === undefined, 'Unobvious way to check __proto__ assignment by linking');
         test.done();
     }
 };
@@ -248,9 +248,9 @@ exports.object_reference = {
             a[d].x=3;'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].getField('0') !== null, 'create numeric literal property');
-        test.ok(ast.scope.names['a'].getField('asd') !== null, 'create string literal property');
-        test.ok(ast.scope.names['a'].getField('d') === null, 'dont create property on computed property access');
+        test.ok(ast.scope.names.get('a').getField('0') !== null, 'create numeric literal property');
+        test.ok(ast.scope.names.get('a').getField('asd') !== null, 'create string literal property');
+        test.ok(ast.scope.names.get('a').getField('d') === null, 'dont create property on computed property access');
         test.done();
     },
     markInternals:function (test) {
@@ -262,9 +262,9 @@ exports.object_reference = {
             }'
         );
         analyzer.analyze(ast);
-        test.ok(ast.scope.names['a'].internal, 'mark internal from var');
-        test.ok(ast.scope.names['c'].getField('d').internal, 'mark internal from function expression');
-        test.ok(ast.scope.names['c'].getField('d').instance.getField('method').internal, 'mark internal from method object literal prototype');
+        test.ok(ast.scope.names.get('a').internal, 'mark internal from var');
+        test.ok(ast.scope.names.get('c').getField('d').internal, 'mark internal from function expression');
+        test.ok(ast.scope.names.get('c').getField('d').instance.getField('method').internal, 'mark internal from method object literal prototype');
         test.done();
     }
 };
