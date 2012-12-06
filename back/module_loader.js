@@ -6,7 +6,7 @@ var Module = require('../analyzer/simple_module.js').SimpleModule;
 
 var modules = exports.modules = {};
 
-exports.loadModuleList = function() {
+function loadModuleList() {
     var loadDefer = q.defer();
     fs.readdir(config.srcPath, function (err, files) {
         if (err) {
@@ -24,7 +24,7 @@ exports.loadModuleList = function() {
     return loadDefer.promise;
 }
 
-exports.loadModule = function (id) {
+function loadModule(id) {
     console.log('loading', id);
     var loadDefer = q.defer();
     if (!fs.existsSync(config.cachePath)) {
@@ -92,10 +92,12 @@ exports.getModule = function (req, res) {
             var obj = modules[req.params.id];
             res.send(obj.toJSON());
         } catch (e) {
-            console.log('Error in getModule:',req.params.id, e.message, e.stack);
+            console.log('Error in getModule:', req.params.id, e.message, e.stack);
         }
     }).fail(function (err) {
             res.send(err);
         })
 };
 
+exports.loadModuleList = loadModuleList;
+exports.loadModule = loadModule;

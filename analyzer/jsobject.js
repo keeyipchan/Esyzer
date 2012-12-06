@@ -84,7 +84,7 @@ JSObject.prototype = {
         var res = {
             name:this.name,
             fields:_.map(this.fields, function (val) {
-                return val.obj.toJSON();
+                return val.toJSON();
             })
         };
         if (this.isClass) {

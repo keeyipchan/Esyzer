@@ -39,24 +39,24 @@ SimpleModule.prototype = {
         analyzer.analyze(this.ast);
         this.global = this.ast.scope.names;
 
-        for (var n in this.global) {
-            this.resolveRefs(this.global[n]);
-        }
+        for (var i=0;i<this.global.length;i++) {
+            this.resolveRefs(this.global[i]);
+        };
         this.analyzed = true;
 
         return this;
     },
     resolveRefs:function (n) {
-        var f,r;
+        var i,r;
         for (r in n.refs)
             n.refs[r].merge(n);
 
-        for (f in n.fields)
-            this.resolveRefs(n.fields[f]);
+        for (i=0;i<n.fields.length;i++)
+            this.resolveRefs(n.fields[i]);
 
         if (n.isClass)
-            for (f in n.instance.fields)
-                this.resolveRefs(n.instance.fields[f]);
+            for (i=0;i<n.instance.fields.length;i++)
+                this.resolveRefs(n.instance.fields[i]);
 
     }
 };
